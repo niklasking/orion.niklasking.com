@@ -1,0 +1,276 @@
+<% include partials/header %>
+
+<script src='/static/js/fullcalendar_sv.js'></script>
+<link rel="stylesheet" href="/static/css/calendar.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin="">
+<script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js" integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg==" crossorigin=""></script>
+
+<script>
+    $(function() {
+        $('#calendar').fullCalendar({
+            locale: 'sv',
+            firstDay: 1,
+            height: "auto",
+            defaultView: 'listWeek',
+            timezone: 'local',
+            header: {
+                left: false,
+                center: false,
+                right: false
+            },
+            events: <%- JSON.stringify(event_list) %>,
+            eventClick: function(calEvent, jsEvent, view) {
+                // location.replace("/calendar:" + calEvent._id);
+                // alert('Event: ' + calEvent._id);
+                $("#modal-title").text(calEvent.title);
+                $('#time-and-date').text(moment(calEvent.start).format("YYYY-MM-DD HH:mm"));
+                $('#description').html(calEvent.description);
+                $('#responsible').text(calEvent.ansvarig);
+                if (calEvent.link != undefined && calEvent.link.length > 0) {
+                    $('#link-div').attr('style', 'visibility: none;');
+                    $('#link').attr('href', calEvent.link);
+                } else {
+                    $('#link-div').attr('style', 'visibility: hidden;');
+                }
+
+                if (calEvent.lat != "" && calEvent.lng != "") {
+                    $('#mapid-modal').attr('style', 'visibility: none;');
+                    if (mymap != undefined) {
+                        mymap.remove();
+                    }
+                    mymap = L.map('mapid-modal').setView([calEvent.lat, calEvent.lng], 11);
+                    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+                        maxZoom: 18,
+                        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+                            '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                            'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                        id: 'mapbox.streets'
+                    }).addTo(mymap);
+
+                    if (marker) { // check
+                        mymap.removeLayer(marker); // remove
+                    }
+                    marker = new L.Marker([calEvent.lat, calEvent.lng]);
+                    marker.addTo(mymap);
+                } else {
+                    $('#mapid-modal').attr('style', 'visibility: hidden;');
+                }
+
+                $('#calendarModal').modal('show');
+            }
+        });
+    });
+</script>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-6 bg-white front-page description d-none d-md-block">
+                <h1 class="text-center d-none d-xl-block">Vi Är Stjärnorna Som Lyser Starkast!</h1>
+                <h2 class="text-center d-none d-lg-block d-xl-none">Vi Är Stjärnorna Som Lyser Starkast!</h2>
+                <h4 class="text-center d-block d-md-block d-lg-none">Vi Är Stjärnorna Som Lyser Starkast!</h4>
+                <p class="text-center">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Exercitationem, doloremque dolores officia eos, est odit obcaecati quidem aperiam animi voluptates quaerat veritatis. Praesentium veniam quibusdam reprehenderit doloremque repellat nisi quia.
+            </p>
+        </div>
+    </div>
+</div>
+<div class="container mb-5">
+    <div class="row">
+        <div class="card col-12 col-sm-3 title-page mr-0 py-3 rounded-0 border-0 text-center">
+            <h5 class="card-title">Karlskrona Stadslopp</h5>
+            <h6 class="card-title">1 augusti 2019</h6>
+            <small class="card-text mt-2 d-none d-lg-block">
+                Du springer längs en mycket publikvänlig bana mitt i centrala Karlskrona och längs Skärgårdsfestens stråk. Banan är väl utmärkt med pilar och snitslar. Ofta heldragna. 
+            </small>
+            <hr>
+            <a href="#" class="card-link">Läs mer ...</a>
+        </div>
+        <div class="col-12 col-sm-9 p-0">
+            <img src="/static/imgs/karlskronaStadslopp.png" alt="" class="img-fluid rounded-0 title-page">
+        </div>
+    </div>
+    <div class="row mt-4 flex-row-reverse">
+        <div class="card col-12 col-sm-3 title-page mr-0 py-3 rounded-0 border-0 text-center">
+            <h5 class="card-title">Börja Orientera</h5>
+            <h6 class="card-title d-none d-md-block">Varje Tisdag vid Orionstugan</h6>
+            <small class="card-text d-none d-lg-block">
+                Lorem ipsum, dolor sit amet consectetur adipisicing elit. Veritatis rerum eligendi assumenda dolores, perferendis inventore necessitatibus similique temporibus sapiente molestias.
+            </small>
+            <hr>
+            <a href="#" class="card-link">Läs mer ...</a>
+        </div>
+        <div class="col-12 col-sm-9 p-0">
+            <img src="https://images.unsplash.com/photo-1459145521278-090c2974b9ff?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=8d02de4c12411cf849f7d323afc847fd&auto=format&fit=crop&w=1400&q=80" alt="" class="img-fluid rounded-0">
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="card col-12 col-sm-3 title-page mr-0 py-3 rounded-0 border-0 text-center">
+            <h5 class="card-title">Elit</h5>
+            <h6 class="card-title">Orions Stjärnor</h6>
+            <small class="card-text mt-2 d-none d-lg-block">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium repudiandae perspiciatis saepe ipsum excepturi nisi ducimus hic a beatae aspernatur modi quibusdam magnam, tenetur assumenda cumque. Velit quod ratione reprehenderit.
+            </small>
+            <hr>
+            <a href="#" class="card-link">Läs mer ...</a>
+        </div>
+        <div class="col-12 col-sm-9 p-0">
+            <img src="https://scontent-arn2-1.xx.fbcdn.net/v/t1.0-9/36442156_1818509338232414_4841644808042708992_o.jpg?_nc_cat=102&_nc_ht=scontent-arn2-1.xx&oh=d4a1a6b13bacaa1f1d86ecf283305a29&oe=5CA72996" alt="" class="img-fluid rounded-0 title-page">
+        </div>
+    </div>
+    <div class="row mt-4 flex-row-reverse">
+            <div class="card col-12 col-sm-3 title-page mr-0 py-3 rounded-0 border-0 text-center">
+                <h5 class="card-title">Nattcupen</h5>
+                <h6 class="card-title">Varje Torsdag</h6>
+                <small class="card-text mt-2 d-none d-lg-block">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium repudiandae perspiciatis saepe ipsum excepturi nisi ducimus hic a beatae aspernatur modi quibusdam magnam, tenetur assumenda cumque. Velit quod ratione reprehenderit.
+                </small>
+                <hr>
+                <a href="#" class="card-link">Läs mer ...</a>
+            </div>
+            <div class="col-12 col-sm-9 p-0">
+                <img src="https://images.unsplash.com/photo-1528419019813-067c18deee09?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=d937651a9820e4011560ec8c26fb6d36&auto=format&fit=crop&w=1655&q=80" alt="" class="img-fluid rounded-0 title-page">
+            </div>
+        </div>
+    <hr>
+    <div class="row">
+        <div class="col-md-4">
+            <h1>Senaste Nytt</h1>
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Nemo soluta obcaecati necessitatibus esse, at fuga laborum pariatur perferendis commodi, quidem dolorem repudiandae corporis beatae. Veritatis vel commodi odit quam unde?</p>
+        </div>
+        <div class="col-md-4">
+            <h1>Träning</h1>
+            <div id="calendar"></div>
+        </div>
+        <div class="col-md-4">
+            <h1>Tävling</h1>
+            <h3>Blekingetävlingar</h3>
+            <table class="table table-sm table-striped">
+                <thead>
+                    <tr>
+                        <td scope="col">Datum</td>
+                        <td scope="col">Tävling</td>
+                        <td scope="col">Arrangör</td>
+                        <td scope="col">T</td>
+                        <td scope="col">Orion</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1/11</td>
+                        <td><a href="https://eventor.orientering.se/Events/Show/23804">Östra Blekinges Nattcup 1</a></td>
+                        <td><img src="/static/imgs/288.png" alt="">OK Orion</td>
+                        <td>N</td>
+                        <td>34</td>
+                    </tr>
+                    <tr>
+                        <td>8/11</td>
+                        <td><a href="https://eventor.orientering.se/Events/Show/24036">Östra Blekinges Nattcup 2</a></td>
+                        <td><img src="/static/imgs/288.png" alt="">OK Orion<br><img src="/static/imgs/2698.png">Karlskrona SOK</td>
+                        <td>N</td>
+                        <td>31</td>
+                    </tr>
+                    <tr>
+                        <td>15/11</td>
+                        <td><a href="https://eventor.orientering.se/Events/Show/24037">Östra Blekinges Nattcup 3</a></td>
+                        <td><img src="/static/imgs/288.png" alt="">OK Orion</td>
+                        <td>N</td>
+                        <td>30</td>
+                    </tr>
+                    <tr>
+                        <td>22/11</td>
+                        <td><a href="https://eventor.orientering.se/Events/Show/24038">Östra Blekinges Nattcup 4</a></td>
+                        <td><img src="/static/imgs/288.png" alt="">OK Orion<br><img src="/static/imgs/310.png">Ronneby OK</td>
+                        <td>N</td>
+                        <td>26</td>
+                    </tr>
+                    <tr>
+                        <td>25/11</td>
+                        <td><a href="">Skinkskubbet</a></td>
+                        <td><img src="/static/imgs/339.png" alt="">OK Skogsfalken</td>
+                        <td>L</td>
+                        <td>1</td>
+                    </tr>
+                    <tr>
+                        <td>29/11</td>
+                        <td><a href="https://eventor.orientering.se/Events/Show/24039">Östra Blekinges Nattcup 5</a></td>
+                        <td><img src="/static/imgs/288.png" alt="">OK Orion</td>
+                        <td>N</td>
+                        <td>31</td>
+                    </tr>
+                    <tr>
+                        <td>29/11</td>
+                        <td><a href="https://eventor.orientering.se/Events/Show/24132">Pölder Sport Nattcup Etapp 1</a></td>
+                        <td><img src="/static/imgs/551.png" alt="">OK Vilse 87</td>
+                        <td>N</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>6/12</td>
+                        <td><a href="https://eventor.orientering.se/Events/Show/24040">Östra Blekinges Nattcup 6</a></td>
+                        <td><img src="/static/imgs/288.png" alt="">OK Orion<br><img src="/static/imgs/2698.png">Karlskrona SOK</td>
+                        <td>N</td>
+                        <td>1</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="calendarModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-title">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-4">
+                        <strong>Tid och datum:</strong>
+                    </div>
+                    <div class="col-8">
+                        <span id="time-and-date"></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <span id="description"></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <strong>Ansvarig:</strong>
+                    </div>
+                    <div class="col-8">
+                        <span id="responsible"></span>
+                    </div>
+                </div>
+                <div class="row" id="link-div">
+                    <div class="col" id="link-div-2">
+                        <a id="link" href="">Läs mer...</a>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div id="mapid-modal"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var mymap;
+    var marker;
+</script>
+<script>
+    $('#calendarModal').on('shown.bs.modal', function (e) {
+        mymap.invalidateSize(true);
+    })
+</script>
+
+<% include partials/footer %>

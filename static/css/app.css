@@ -1,0 +1,30 @@
+body {
+    font-family: 'Oswald', serif;
+}
+.title-page.jumbotron {
+    background: url(https://images.unsplash.com/photo-1448375240586-882707db888b?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=dd1c3895999a4f9c5e4ac57e6e9fa2fb&auto=format&fit=crop&w=500&q=60) no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+
+    color: white;
+}
+.title-page.card {
+    background: #f7f7f4;
+}
+img.title-page {
+    background-repeat: no-repeat;
+    background-position: center;
+    background-clip: padding-box;
+
+}
+.front-page.description {
+    color: #5b6367;
+}
+table {
+    font-size: 0.8em;
+}
+table a {
+    color: rgb(92, 94, 185);
+}

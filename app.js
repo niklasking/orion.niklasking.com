@@ -1,0 +1,144 @@
+var express         = require('express'),
+    request         = require('request'),
+    bodyParser      = require('body-parser'),
+    parseXMLString  = require('xml2js').parseString,
+    flash           = require('connect-flash'),
+    mongoose        = require('mongoose'),
+    passport        = require('passport'),
+    CustomStrategy  = require('passport-custom'),
+    Tabulator       = require('tabulator-tables'),
+    Runner          = require('./models/runner'),
+    Competition     = require('./models/competition');
+
+var indexRoutes         = require("./routes/index");
+var adminRoutes         = require("./routes/admin");
+var resultsRoutes       = require("./routes/results");
+var playgroundRoutes    = require("./routes/playground");
+
+var API_KEY = "";
+
+var dbUrl = process.env.DATABASEURL || "mongodb://localhost/orionpokalen";
+mongoose.connect(dbUrl);
+
+var app = express();
+app.set("view engine", "ejs");
+app.use(bodyParser.urlencoded({extended: true}));
+app.use('/static', express.static('static'));
+app.use(flash());
+
+app.use(require("express-session")({
+    secret: "Ole King cyklade runt Hagel Island on the ice with suger in his hair",
+    resave: false,
+    saveUninitialized: false
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use('custom', new CustomStrategy(
+    function(req, done) {
+        var eventorLogin = process.env.EVENTOR_LOGIN || "0";
+        if (eventorLogin == "0") {
+            // ===================================================================
+            // THIS IS A TEMPORARY SOLUTION - TO BE REMOVED WHEN USING EVENTOR
+            // ===================================================================
+            if (req.body.username == "orion" && req.body.password == "OrionVinner10mila2019") {
+                var user = {
+                    eventorId:          "12345",
+                    nameFamily:         "Orion",
+                    nameGiven:          "OK",
+                    phoneNumber:        "123456789",
+                    mobilePhoneNumber:  "987654321",
+                    mailAddress:        "orion@orion.orion"
+                };
+                done(null, user);
+            } else {
+                done(null, null);
+            }
+            // ===================================================================
+            // END
+            // ===================================================================
+        } else {
+            // ===================================================================
+            // THIS IS THE EVENTOR AUTHENTICATION - ACTIVATE ONCE HTTPS IS ENABLED
+            // ===================================================================
+            var options = {
+                url: 'https://eventor.orientering.se/api/authenticatePerson',
+                headers: {
+                'ApiKey': API_KEY,
+                'Username': req.body.username,
+                'Password': req.body.password
+                }
+            };
+            request(options, function(error, response, body) {
+                if (!error && response.statusCode == 200) {
+                    parseXMLString(body, function(err, result) {
+                        // console.log("Frågat Eventor. fick svaret: " + response.statusCode + ": " + err);
+                        if (err) {
+                            done(err, null);
+                        }
+                        var eventorId           = result.Person.PersonId;
+                        var nameFamily          = result.Person.PersonName[0].Family;
+                        var nameGiven           = result.Person.PersonName[0].Given[0]._;
+                        var phoneNumber         = "";
+                        var mobilePhoneNumber   = "";
+                        var mailAddress         = "";
+                        if (result.Person.Tele[0].TeleType[0].$.value.toString() == "official") {
+                            phoneNumber         = result.Person.Tele[0].$.phoneNumber;
+                            mobilePhoneNumber   = result.Person.Tele[0].$.mobilePhoneNumber;
+                            mailAddress         = result.Person.Tele[0].$.mailAddress;    
+                        }
+                        var user = {
+                            eventorId:          eventorId,
+                            nameFamily:         nameFamily,
+                            nameGiven:          nameGiven,
+                            phoneNumber:        phoneNumber,
+                            mobilePhoneNumber:  mobilePhoneNumber,
+                            mailAddress:        mailAddress
+                        };
+                        done(null, user);
+                    });
+                } else {
+                    // User not found: 404
+                    // Fel lösenord: 404
+                    // console.log("Frågat Eventor. fick svaret :-(: " + response.statusCode + ": " + error);
+                    done(error, null);
+                }
+            });   
+            // ===================================================================
+            // END
+            // ===================================================================
+        }
+    }
+  ));
+
+passport.serializeUser(function(user, done) {
+    done(null, user);
+});
+passport.deserializeUser(function(user, done) {
+    done(null, user);
+});
+
+app.use(function(req, res, next) {
+    res.locals.currentUser = req.user;
+    res.locals.error        = req.flash("error");
+    res.locals.success      = req.flash("success");
+    next();
+});
+
+
+var db = mongoose.connection;
+db.on('error', console.error.bind("Could not connect to MongoDB"));
+db.once('open', function() {
+
+});
+
+app.use("/", indexRoutes);
+app.use("/", adminRoutes);
+app.use("/", resultsRoutes);
+app.use("/", playgroundRoutes);
+
+var server = app.listen(4455, process.env.IP, function() {
+// var server = app.listen(process.env.PORT, process.env.IP, function() {
+    console.log("Orionpokalen is started at port: " + server.address().port);
+});

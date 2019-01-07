@@ -1,0 +1,93 @@
+<% include ../partials/header %>
+<link href="/static/css/tabulator.min.css" rel="stylesheet">
+<script type="text/javascript" src="/static/js/tabulator.min.js"></script>
+
+<div class="container">
+    <h1>Resultat - <%= year %></h1>
+    <div class="row">
+        <div class="col"><a href="/resultat/runners/A">A</a></div>
+        <div class="col"><a href="/resultat/runners/B">B</a></div>
+        <div class="col"><a href="/resultat/runners/C">C</a></div>
+        <div class="col"><a href="/resultat/runners/D">D</a></div>
+        <div class="col"><a href="/resultat/runners/E">E</a></div>
+        <div class="col"><a href="/resultat/runners/F">F</a></div>
+        <div class="col"><a href="/resultat/runners/G">G</a></div>
+        <div class="col"><a href="/resultat/runners/H">H</a></div>
+        <div class="col"><a href="/resultat/runners/I">I</a></div>
+        <div class="col"><a href="/resultat/runners/J">J</a></div>
+        <div class="col"><a href="/resultat/runners/K">K</a></div>
+        <div class="col"><a href="/resultat/runners/L">L</a></div>
+        <div class="col"><a href="/resultat/runners/M">M</a></div>
+        <div class="col"><a href="/resultat/runners/N">N</a></div>
+        <div class="col"><a href="/resultat/runners/O">O</a></div>
+        <div class="col"><a href="/resultat/runners/P">P</a></div>
+        <div class="col"><a href="/resultat/runners/Q">Q</a></div>
+        <div class="col"><a href="/resultat/runners/R">R</a></div>
+        <div class="col"><a href="/resultat/runners/S">S</a></div>
+        <div class="col"><a href="/resultat/runners/T">T</a></div>
+        <div class="col"><a href="/resultat/runners/U">U</a></div>
+        <div class="col"><a href="/resultat/runners/V">V</a></div>
+        <div class="col"><a href="/resultat/runners/W">W</a></div>
+        <div class="col"><a href="/resultat/runners/X">X</a></div>
+        <div class="col"><a href="/resultat/runners/Y">Y</a></div>
+        <div class="col"><a href="/resultat/runners/Z">Z</a></div>
+        <div class="col"><a href="/resultat/runners/Å">Å</a></div>
+        <div class="col"><a href="/resultat/runners/Ä">Ä</a></div>
+        <div class="col"><a href="/resultat/runners/Ö">Ö</a></div>
+        <div class="col"><a href="/resultat/runners/Ø">Ø</a></div>
+    </div>
+    <div class="row">
+        <div class="col"><a href="/resultat/runners">Visa alla</a> (VARNING: Detta kan ta väldigt lång tid.)</div>
+    </div>
+    <div id="example-table" class="mb-5 mt-4"></div>
+</div>
+
+<script>
+    var tabledata = [];
+    <% runners.forEach(function(runner) { %>
+        <% var comps = runner.competitions %>
+        <% comps.sort(function(a, b){ return a.date.localeCompare(b.date)}) %>
+        <% comps.forEach(function(comp) { %>
+            var ok = "";
+            <% if (comp.resultOk) { %>
+                ok = "OK";
+            <% } %>
+            var relayInfo = <%= comp.relay %> ? "<%= comp.relayTeam %>, sträcka <%= comp.relayLeg %>" : ""; 
+            tabledata.push({eventorId:  "<%= comp.eventorId %>",
+                            runnerName: "<%= runner.nameFamily %> <%= runner.nameGiven %>",
+                            date:       "<%= comp.date %>",
+                            name:       "<%= comp.name %>", 
+                            className:  "<%= comp.className %>",
+                            resultOk:   ok,
+                            position:   "<%= comp.positionStr %>",
+                            starts:     "<%= comp.starts %>",
+                            relayInfo:  relayInfo});
+                            // relayInfo:  "<%= comp.relayTeam %>, Sträcka <%= comp.relayLeg %>"});
+        <% }) %>
+    <% }) %>
+
+    //create Tabulator on DOM element with id "example-table"
+    var table = new Tabulator("#example-table", {
+        //height:205, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
+        data:tabledata, //assign data to table
+        responsiveLayout:"hide",
+        groupBy: "runnerName",
+        layout:"fitColumns", //fit columns to width of table (optional)
+        columns:[ //Define Table Columns
+            {title:"Namn", field:"runnerName", minWidth: 100, responsive: 0, headerFilter:"input"},
+            {title:"Datum", field:"date", width: 75, responsive: 0, headerFilter:"input"},
+            {title:"Tävling", field:"name", minWidth: 250, responsive: 0, headerFilter:"input"},
+            {title:"Klass", field:"className", align:"right", responsive: 0, headerFilter:"input"},
+            {title:"Godkänd", field:"resultOk", width: 80, responsive: 2, headerFilter:"input"},
+            {title:"Placering", field:"position", width: 80, responsive: 2, headerFilter:"input"},
+            {title:"Startande", field:"starts", width: 80, responsive: 3, headerFilter:"input"},
+            {title:"Lag & Sträcka", field:"relayInfo", responsive: 4, headerFilter:"input"},
+        ],
+        // rowClick:function(e, row){ //trigger an alert message when the row is clicked
+        //     // alert("Row " + row.getData().id + " Clicked!!!!");
+        //     $(location).attr('href', url);
+        // },
+    });
+</script>
+
+<% include ../partials/footer %>

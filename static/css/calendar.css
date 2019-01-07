@@ -1,0 +1,33 @@
+.fc-content {
+    color: white;
+    font-size: .75rem;
+    background: rgb(88, 130, 228);
+}
+.eventTraining div {
+    color: white;
+    background: rgb(88, 130, 228);
+}
+.eventTraining {
+    /* color: red; */
+}
+.fc-event-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 0;
+    margin-top: 4px;
+}
+.eventTraining td .fc-event-dot {
+    background-image: url("/static/imgs/activity_type_1.gif");
+}
+.eventCompetition td .fc-event-dot {
+    background-image: url("/static/imgs/activity_type_2.gif");
+}
+.eventMeeting td .fc-event-dot {
+    background-image: url("/static/imgs/activity_type_3.gif");
+}
+.eventImportant td .fc-event-dot {
+    background-image: url("/static/imgs/activity_type_4.gif");
+}
+
+#mapid { height: 250px; }
+#mapid-modal { height: 200px; }

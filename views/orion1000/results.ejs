@@ -1,0 +1,42 @@
+<% include ../partials/header %>
+<div class="container">
+    <h1><%= runner.nameGiven %> <%= runner.nameFamily %></h1>
+    
+    <table>
+        <tr>
+            <th>Datum</th>
+            <th>Namn</th>
+            <th>Klass</th>
+            <th>Godkänd</th>
+            <th>Placering</th>
+            <th>Startande</th>
+            <th>Lag & Sträcka</th>
+            <th>Poäng</th>
+        </tr>
+            <% var comps = runner.competitions %>
+            <% comps.sort(function(a, b){ return a.date.localeCompare(b.date)}) %>
+            <% comps.forEach(function(comp) { %>
+                <tr>
+                    <td><%= comp.date %></td>
+                    <td><%= comp.name %></td>
+                    <td><%= comp.className %></td>
+                    <% if (comp.resultOk) { %>
+                        <td>OK</td>
+                    <% } else { %>
+                        <td>-</td>
+                    <% } %>
+                    <td><%= comp.positionStr %></td>
+                    <td><%= comp.starts %></td>
+                    <% if (comp.relay) { %>
+                        <td><%= comp.relayTeam %>, sträcka <%= comp.relayLeg %></td>
+                    <% } else { %>
+                        <td></td>
+                    <% } %>
+                    <td><%= comp.points %></td>
+                </tr>
+            <% }); %>
+    </table>
+    <a href="/<%= compType %>" class="btn btn-primary mt-3">Tillbaka</a>
+</div>
+
+<% include ../partials/footer %>
