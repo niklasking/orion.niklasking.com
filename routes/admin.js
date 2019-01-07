@@ -11,7 +11,7 @@ var express         = require('express'),
 var YEAR = 2018;
 var ORIONPOKALEN_YEAR = YEAR - 17;
 var ORINGEN_ELITSPRINT = 24317;
-var API_KEY = "";
+var API_KEY = "a7ff03d951bf4584a848df74aca6768d";
 
 // Step 1. Clear all and read all runners
 router.get("/runners/init", function(req, res) {
@@ -21,52 +21,357 @@ router.get("/runners/init", function(req, res) {
           'ApiKey': API_KEY
         }
     };
-    request(options, function(error, response, body) {
-        if (!error && response.statusCode == 200) {
+    var foundMembers = 0;
+    var data;
+    // Get members from Eventor
+    var dataPromise = new Promise(function(resolve, reject) {
+        request(options, function(error, response, body) {
+            if (error || response.statusCode != 200) {
+                req.flash("error", "Nu blev det knas i steg 1 :-(");
+                console.log("error 1");
+                reject(err);
+            } else {
+                console.log("ok 1");
+                data = body;
+                resolve(data);
+            }
+        });
+    }).then(function(result) {
+    // Remove all members in database
+        return new Promise((resolve, reject) => {
             Runner.remove({}, function(err) {
                 if (err) {
-                    console.log(err);
+                    console.log("error 2");
+                    req.flash("error", "Nu blev det knas i steg 2 :-(");
+                    reject(err);
                 } else {
-                    Competition.remove({}, function(err) {
-                        if (err) {
-                            console.log(err);
-                        } else {
-                            parseXMLString(body, function(err, result) {
-                                if (err) {
-                                    console.log(err);
-                                } else {
-                                    result.PersonList.Person.forEach(function(runner) {
-                                        var runnerNameGiven     = runner.PersonName[0].Given[0]._;
-                                        var runnerNameFamily    = runner.PersonName[0].Family;
-                                        var runnerBirth         = runner.BirthDate[0].Date;
-                                        var runnerBirthYear     = parseInt(runnerBirth.toString().substring(0, 4));
-                                        var runnerEventorId     = runner.PersonId;
-                                        var newRunner = new Runner({
-                                            nameGiven: runnerNameGiven,
-                                            nameFamily: runnerNameFamily,
-                                            birth: runnerBirth,
-                                            birthYear: runnerBirthYear,
-                                            eventorId: runnerEventorId
+                    console.log("ok 2");
+                    resolve();
+                }
+            });    
+        });
+    }).then(function(result) {
+    // Remove all competitions from database
+        return new Promise((resolve, reject) => {
+            Competition.remove({}, function(err) {
+                if (err) {
+                    console.log("error 3");
+                    req.flash("error", "Nu blev det knas i steg 3 :-(");
+                    reject(err);
+                } else {
+                    console.log("ok 3");
+                    resolve();
+                }
+            });
+        });
+    }).then(function(result) {
+    // Add members to database
+        return new Promise((resolve, reject) => {
+            parseXMLString(data, function(err, result) {
+                if (err) {
+                    console.log("error 4");
+                    req.flash("error", "Nu blev det knas i steg 4 :-(");
+                    reject(err);
+                } else {
+                    console.log("ok 4");
+                    resolve(result);
+                }
+            });
+        });
+    }).then(function(result) {
+        return new Promise((resolve, reject) => {
+            result.PersonList.Person.forEach(function(runner) {
+                var runnerNameGiven     = runner.PersonName[0].Given[0]._;
+                var runnerNameFamily    = runner.PersonName[0].Family;
+                var runnerBirth         = runner.BirthDate[0].Date;
+                var runnerBirthYear     = parseInt(runnerBirth.toString().substring(0, 4));
+                var runnerEventorId     = runner.PersonId;
+                var newRunner = new Runner({
+                    nameGiven: runnerNameGiven,
+                    nameFamily: runnerNameFamily,
+                    birth: runnerBirth,
+                    birthYear: runnerBirthYear,
+                    eventorId: runnerEventorId
+                });
+                // console.log("Found runner: " + newRunner.nameGiven + " " + newRunner.nameFamily);
+                newRunner.save(function(err, data) {
+                    if (err) {
+                        req.flash("error", "Nu blev det knas i steg 5 :-(");
+                        console.log("error 5");
+                        reject(err);
+                    }
+                });        
+            });
+            console.log("ok 5");
+            resolve();      
+        });
+    }).then(function(result) {
+        return new Promise((resolve, reject) => {
+            var query = Runner.
+                        find({});
+            query.exec(function(err, runners) {
+                if (err) {
+                    console.log("error 6");
+                    req.flash("error", "Nu blev det knas i steg 6 :-(");
+                    reject(err);
+                } else {
+                    console.log("ok 6");
+                    resolve(runners);
+                }
+            });
+        });
+    }).then(function(runners) {
+        return new Promise((resolve, reject) => {
+            runners.forEach(function(runner) {
+                var runnerId = runner.eventorId;
+                var options = {
+                    url: 'https://eventor.orientering.se/api/results/person?personId=' + runnerId + '&fromDate=' + YEAR + '-01-01&toDate=' + YEAR + '-12-31',
+                    headers: {
+                    'ApiKey': API_KEY
+                    }
+                };
+                request(options, function(error, response, body) {
+                    console.log("Dax att parsa!");
+                    if (error || response.statusCode != 200) {
+                        console.log("error 7");
+                        req.flash("error", "Nu blev det knas i steg 7 :-(");
+                        reject(err);
+                    } else {
+                        parseXMLString(body, function(err, result) {
+                            if (err) {
+                                console.log(err);
+                            } else if (result.ResultListList.ResultList == undefined) {
+                            } else {
+console.log("Found results for runner: " + runnerId);
+                                var competitionsArray = [];
+                                result.ResultListList.ResultList.forEach(function(comp) {
+                                    var eventorId = comp.Event[0].EventId;
+                                    var name = comp.Event[0].Name;
+                                    var date = comp.Event[0].StartDate[0].Date;
+                                    var year = YEAR;
+                                    var category = comp.Event[0].EventClassificationId;
+                                    var className = comp.ClassResult[0].EventClass[0].Name;
+                                    var classType = comp.ClassResult[0].EventClass[0].ClassTypeId;
+                                    var starts = parseInt(comp.ClassResult[0].EventClass[0].ClassRaceInfo[0].$.noOfStarts);
+
+                                    var relay = comp.ClassResult[0].EventClass[0].$.teamEntry == "Y" ? true : false;
+                                    var statusOk = comp.Event[0].EventStatusId == "9" ? true : false;
+                                    var multi = comp.Event[0].$.eventForm == "IndMultiDay" ? true : false;
+                                    var resultOk = true;
+                                    var positionStr = "";
+                                    var relayTeam = "";
+                                    var relayLeg = "";
+                                    if (!relay) {
+                                        if (!multi) {
+                                            // Endagstävling
+                                            var resultOk = comp.ClassResult[0].PersonResult[0].Result[0].CompetitorStatus[0].$.value == "OK" ? true : false;
+                                            if (resultOk) {
+                                                positionStr = comp.ClassResult[0].PersonResult[0].Result[0].ResultPosition;
+                                            }
+
+                                            var newCompetition = new Competition({
+                                                eventorId: eventorId,
+                                                name: name,
+                                                date: date,
+                                                category: category,
+                                                statusOk: statusOk,
+                                                className: className,
+                                                classType: classType,
+                                                resultOk: resultOk,
+                                                positionStr: positionStr,
+                                                starts: starts,
+                                                relay: relay,
+                                                relayTeam: relayTeam,
+                                                relayLeg: relayLeg
+                                            });
+                                            if (comp.ClassResult[0].PersonResult[0].Organisation != undefined) {
+                                                if (comp.ClassResult[0].PersonResult[0].Organisation[0].OrganisationId == "288") {
+                                                    // Remove O-ringen elitsprinten, since it is also reported for O-ringen.
+                                                    if (eventorId.toString() != ORINGEN_ELITSPRINT) {
+                                                        competitionsArray.push(newCompetition);
+                                                    }
+                                                }
+                                            }
+                                        } else {
+                                            // Flerdagarstävling
+                                            var eventName = name;
+                                            // Check if reported as kval & final, as for SM
+                                            if (comp.ClassResult.length > 1) {
+                                                for (var day = 0; day < comp.ClassResult.length; day++) {
+                                                    positionStr = "";
+                                                    starts = starts = parseInt(comp.ClassResult[day].EventClass[0].ClassRaceInfo[0].$.noOfStarts);
+                                                    name = eventName + " " + comp.ClassResult[day].EventClass[0].Name;
+                                                    className = comp.ClassResult[day].EventClass[0].Name;
+                                                    date = comp.ClassResult[day].PersonResult[0].RaceResult[0].Result[0].StartTime[0].Date;
+                                                    resultOk = comp.ClassResult[day].PersonResult[0].RaceResult[0].Result[0].CompetitorStatus[0].$.value == "OK" ? true : false;
+                                                    if (resultOk) {
+                                                        // position = parseInt(comp.ClassResult[0].PersonResult[day].RaceResult[0].Result[0].ResultPosition);
+                                                        positionStr = comp.ClassResult[day].PersonResult[0].RaceResult[0].Result[0].ResultPosition;
+                                                    }
+
+                                                    var newCompetition = new Competition({
+                                                        eventorId: eventorId,
+                                                        name: name,
+                                                        date: date,
+                                                        category: category,
+                                                        statusOk: statusOk,
+                                                        className: className,
+                                                        classType: classType,
+                                                        resultOk: resultOk,
+                                                        positionStr: positionStr,
+                                                        starts: starts,
+                                                        relay: relay,
+                                                        relayTeam: relayTeam,
+                                                        relayLeg: relayLeg
+                                                    });
+                                                    if (comp.ClassResult[day].PersonResult[0].Organisation != undefined) {
+                                                        if (comp.ClassResult[day].PersonResult[0].Organisation[0].OrganisationId == "288") {
+                                                            competitionsArray.push(newCompetition);
+                                                        }
+                                                    }
+                                                }
+                                            } else {
+                                                for (var day = 0; day < comp.ClassResult[0].PersonResult.length; day++) {
+                                                    positionStr = "";
+                                                    var eventRaceId = comp.ClassResult[0].PersonResult[day].RaceResult[0].EventRaceId;
+                                                    comp.Event[0].EventRace.forEach(function(eventRace) {
+                                                        // console.log(eventRace.EventRaceId + " - " + eventRaceId);
+                                                        if (eventRace.EventRaceId.toString() == eventRaceId.toString()) {
+                                                            name = eventName + " " + eventRace.Name;
+                                                            date = eventRace.RaceDate[0].Date;        
+                                                        }
+                                                    });
+                                                    resultOk = comp.ClassResult[0].PersonResult[day].RaceResult[0].Result[0].CompetitorStatus[0].$.value == "OK" ? true : false;
+                                                    if (resultOk) {
+                                                        // position = parseInt(comp.ClassResult[0].PersonResult[day].RaceResult[0].Result[0].ResultPosition);
+                                                        positionStr = comp.ClassResult[0].PersonResult[day].RaceResult[0].Result[0].ResultPosition;
+                                                    }
+
+                                                    var newCompetition = new Competition({
+                                                        eventorId: eventorId,
+                                                        name: name,
+                                                        date: date,
+                                                        category: category,
+                                                        statusOk: statusOk,
+                                                        className: className,
+                                                        classType: classType,
+                                                        resultOk: resultOk,
+                                                        positionStr: positionStr,
+                                                        starts: starts,
+                                                        relay: relay,
+                                                        relayTeam: relayTeam,
+                                                        relayLeg: relayLeg
+                                                    });
+                                                    if (comp.ClassResult[0].PersonResult[0].Organisation != undefined) {
+                                                        if (comp.ClassResult[0].PersonResult[0].Organisation[0].OrganisationId == "288") {
+                                                            competitionsArray.push(newCompetition);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    } else {
+                                        // Kavle
+                                        resultOk = comp.ClassResult[0].TeamResult[0].TeamMemberResult[0].CompetitorStatus[0].$.value == "OK" ? true : false;
+                                        if (resultOk) {
+                                            positionStr = parseInt(comp.ClassResult[0].TeamResult[0].TeamMemberResult[0].Position[0]._);
+                                        }
+                                        relayTeam = comp.ClassResult[0].TeamResult[0].TeamName;
+                                        relayLeg = comp.ClassResult[0].TeamResult[0].TeamMemberResult[0].Leg;
+
+                                        var newCompetition = new Competition({
+                                            eventorId: eventorId,
+                                            name: name,
+                                            date: date,
+                                            category: category,
+                                            statusOk: statusOk,
+                                            className: className,
+                                            classType: classType,
+                                            resultOk: resultOk,
+                                            positionStr: positionStr,
+                                            starts: starts,
+                                            relay: relay,
+                                            relayTeam: relayTeam,
+                                            relayLeg: relayLeg
                                         });
-                                        console.log("Found runner: " + newRunner.nameGiven + " " + newRunner.nameFamily);
-                                        newRunner.save(function(err, data) {
-                                            if (err) {
+                                        if (comp.ClassResult[0].TeamResult[0].Organisation != undefined) {
+                                            if (comp.ClassResult[0].TeamResult[0].Organisation[0].OrganisationId == "288") {
+                                                competitionsArray.push(newCompetition);
+                                            }
+                                        }
+                                    }
+                                });
+                                Competition.insertMany(competitionsArray, function(err, comps) {
+                                    if (err) {
+                                        console.log(err);
+                                    } else {
+                                        Runner.update({eventorId: runnerId},{competitions: comps},{upsert:true},function(err){
+                                            if(err){
                                                 console.log(err);
                                             }
-                                        });        
-                                    });
-                                }
-                            });
-                        }
-                    });
-                }
-                res.redirect("/");                
+                                        });
+                                    }
+                                })
+                            }
+                        });
+                    }
+                });
             });
-        }
-        else {
-            res.send("Something went wrong :-(");
-        }
+            console.log("ok 7");
+            resolve(); 
+        });
+    }).then(function(result) {
+        req.flash("success", "Allt är klart!");
+        res.redirect("/");
     });
+    
+
+    // request(options, function(error, response, body) {
+    //     if (!error && response.statusCode == 200) {
+    //         Runner.remove({}, function(err) {
+    //             if (err) {
+    //                 console.log(err);
+    //             } else {
+    //                 Competition.remove({}, function(err) {
+    //                     if (err) {
+    //                         console.log(err);
+    //                     } else {
+    //                         parseXMLString(body, function(err, result) {
+    //                             if (err) {
+    //                                 console.log(err);
+    //                             } else {
+    //                                 result.PersonList.Person.forEach(function(runner) {
+    //                                     var runnerNameGiven     = runner.PersonName[0].Given[0]._;
+    //                                     var runnerNameFamily    = runner.PersonName[0].Family;
+    //                                     var runnerBirth         = runner.BirthDate[0].Date;
+    //                                     var runnerBirthYear     = parseInt(runnerBirth.toString().substring(0, 4));
+    //                                     var runnerEventorId     = runner.PersonId;
+    //                                     var newRunner = new Runner({
+    //                                         nameGiven: runnerNameGiven,
+    //                                         nameFamily: runnerNameFamily,
+    //                                         birth: runnerBirth,
+    //                                         birthYear: runnerBirthYear,
+    //                                         eventorId: runnerEventorId
+    //                                     });
+    //                                     console.log("Found runner: " + newRunner.nameGiven + " " + newRunner.nameFamily);
+    //                                     newRunner.save(function(err, data) {
+    //                                         if (err) {
+    //                                             console.log(err);
+    //                                         }
+    //                                     });        
+    //                                 });
+    //                             }
+    //                         });
+    //                     }
+    //                 });
+    //             }
+    //             res.redirect("/");                
+    //         });
+    //     }
+    //     else {
+    //         res.send("Something went wrong :-(");
+    //     }
+    // });
 });
 
 // Step 2. Fetch all competitions for the year YEAR
