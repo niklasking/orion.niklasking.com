@@ -8,13 +8,13 @@ var express         = require('express'),
     Competition     = require('../models/competition'),
     CalendarEvent   = require('../models/calendarEvent');
 
-var YEAR = 2018;
-var ORIONPOKALEN_YEAR = YEAR - 17;
+// var YEAR = 2018;
+// var ORIONPOKALEN_YEAR = YEAR - 17;
 var ORINGEN_ELITSPRINT = 24317;
 var API_KEY = "a7ff03d951bf4584a848df74aca6768d";
 
 // Step 1. Clear all and read all runners
-router.get("/admin/runners/refresh:year", isLoggedIn, function(req, res) {
+router.get("/admin/runners/refresh/:year", isLoggedIn, function(req, res) {
     var year = req.params.year;
     // FIXA TILL SÅ ATT MAN KAN HA FLERA ÅR.
     // OLIKA COLLECTIONS ELLER OLIKA SÖKMÖNSTER?
@@ -42,7 +42,7 @@ router.get("/admin/runners/refresh:year", isLoggedIn, function(req, res) {
     }).then(function(result) {
     // Remove all members in database
         return new Promise((resolve, reject) => {
-            Runner.remove({}, function(err) {
+            Runner.remove({year: year}, function(err) {
                 if (err) {
                     console.log("error 2");
                     req.flash("error", "Nu blev det knas i steg 2 :-(");
@@ -56,7 +56,7 @@ router.get("/admin/runners/refresh:year", isLoggedIn, function(req, res) {
     }).then(function(result) {
     // Remove all competitions from database
         return new Promise((resolve, reject) => {
-            Competition.remove({}, function(err) {
+            Competition.remove({year: year}, function(err) {
                 if (err) {
                     console.log("error 3");
                     req.flash("error", "Nu blev det knas i steg 3 :-(");
@@ -68,7 +68,7 @@ router.get("/admin/runners/refresh:year", isLoggedIn, function(req, res) {
             });
         });
     }).then(function(result) {
-    // Parse Eventor XML file
+        // Parse Eventor XML file
         return new Promise((resolve, reject) => {
             parseXMLString(data, function(err, result) {
                 if (err) {
@@ -96,7 +96,8 @@ router.get("/admin/runners/refresh:year", isLoggedIn, function(req, res) {
                 nameFamily: runnerNameFamily,
                 birth: runnerBirth,
                 birthYear: runnerBirthYear,
-                eventorId: runnerEventorId
+                eventorId: runnerEventorId,
+                year: year
             });
             // console.log("Found runner: " + newRunner.nameGiven + " " + newRunner.nameFamily);
             promises.push(saveRunner(newRunner));
@@ -125,7 +126,7 @@ router.get("/admin/runners/refresh:year", isLoggedIn, function(req, res) {
                     var promises = [];
                     runners = data;
                     runners.forEach(function(runner) {
-                        promises.push(getCompsForRunner(runner));
+                        promises.push(getCompsForRunner(runner, year));
                     });
                     Promise.all(promises) 
                     .then((results) => {
@@ -327,11 +328,11 @@ function saveRunner(newRunner) {
     });
 }
 
-function getCompsForRunner(runner) {
+function getCompsForRunner(runner, year) {
     var runnerId = runner.eventorId;
     // console.log("Found runner: " + runner.nameGiven + " " + runner.nameFamily);
     var options = {
-        url: 'https://eventor.orientering.se/api/results/person?personId=' + runnerId + '&fromDate=' + YEAR + '-01-01&toDate=' + YEAR + '-12-31',
+        url: 'https://eventor.orientering.se/api/results/person?personId=' + runnerId + '&fromDate=' + year + '-01-01&toDate=' + year + '-12-31',
         headers: {
             'ApiKey': API_KEY
         }
@@ -339,11 +340,11 @@ function getCompsForRunner(runner) {
     return new Promise((resolve, reject) => {
         request(options, function(error, response, body) {
             if (error || response.statusCode != 200) {
-                console.log("error 7.1");
+                console.log("error 7.1: " + error);
                 // req.flash("error", "Nu blev det knas i steg 7.1 :-(");
-                reject(err);
+                // reject(err);
             } else {
-                getAndSaveCompetitions(runner, body);
+                getAndSaveCompetitions(runner, body, year);
                 resolve();
                 // parseXMLString(body, function(err, result) {
                 // });
@@ -352,7 +353,7 @@ function getCompsForRunner(runner) {
     });
 }
 
-function getAndSaveCompetitions(runner, body) {
+function getAndSaveCompetitions(runner, body, year) {
     var runnerId = runner.eventorId;
     parseXMLString(body, function(err, result) {
         if (err) {
@@ -365,7 +366,7 @@ function getAndSaveCompetitions(runner, body) {
                 var eventorId = comp.Event[0].EventId;
                 var name = comp.Event[0].Name;
                 var date = comp.Event[0].StartDate[0].Date;
-                var year = YEAR;
+                // var year = year;
                 var category = comp.Event[0].EventClassificationId;
                 var className = comp.ClassResult[0].EventClass[0].Name;
                 var classType = comp.ClassResult[0].EventClass[0].ClassTypeId;
@@ -399,7 +400,8 @@ function getAndSaveCompetitions(runner, body) {
                             starts: starts,
                             relay: relay,
                             relayTeam: relayTeam,
-                            relayLeg: relayLeg
+                            relayLeg: relayLeg,
+                            year: year
                         });
                         if (comp.ClassResult[0].PersonResult[0].Organisation != undefined) {
                             if (comp.ClassResult[0].PersonResult[0].Organisation[0].OrganisationId == "288") {
@@ -439,7 +441,8 @@ function getAndSaveCompetitions(runner, body) {
                                     starts: starts,
                                     relay: relay,
                                     relayTeam: relayTeam,
-                                    relayLeg: relayLeg
+                                    relayLeg: relayLeg,
+                                    year: year
                                 });
                                 if (comp.ClassResult[day].PersonResult[0].Organisation != undefined) {
                                     if (comp.ClassResult[day].PersonResult[0].Organisation[0].OrganisationId == "288") {
@@ -477,7 +480,8 @@ function getAndSaveCompetitions(runner, body) {
                                     starts: starts,
                                     relay: relay,
                                     relayTeam: relayTeam,
-                                    relayLeg: relayLeg
+                                    relayLeg: relayLeg,
+                                    year: year
                                 });
                                 if (comp.ClassResult[0].PersonResult[0].Organisation != undefined) {
                                     if (comp.ClassResult[0].PersonResult[0].Organisation[0].OrganisationId == "288") {
@@ -509,7 +513,8 @@ function getAndSaveCompetitions(runner, body) {
                         starts: starts,
                         relay: relay,
                         relayTeam: relayTeam,
-                        relayLeg: relayLeg
+                        relayLeg: relayLeg,
+                        year: year
                     });
                     if (comp.ClassResult[0].TeamResult[0].Organisation != undefined) {
                         if (comp.ClassResult[0].TeamResult[0].Organisation[0].OrganisationId == "288") {
@@ -643,7 +648,7 @@ function calculateCupPoints(runner) {
             totalPointsOrion1000 += comps[i].points;
             results.push(comps[i].points);
         }
-        if (comps[i].points == 100) {
+        if (comps[i].points == 100 && comps[i].positionStr == "1") {
             wins++;
         }
     };

@@ -4,12 +4,14 @@ var express     = require('express'),
     Runner      = require('../models/runner'),
     Competition = require('../models/competition');
 
-var YEAR = 2018;
-var ORIONPOKALEN_YEAR = YEAR - 17;
+// var YEAR = 2018;
+// var ORIONPOKALEN_YEAR = YEAR - 17;
 
-router.get("/orionpokalen", function(req, res) {
+router.get("/orionpokalen/:year", function(req, res) {
+    var year = req.params.year;
+    var ORIONPOKALEN_YEAR = year - 17;
     var query = Runner.
-                find({totalPointsOrion1000: { $gt: 0 }, birthYear: { $gt: ORIONPOKALEN_YEAR }}).
+                find({totalPointsOrion1000: { $gt: 0 }, birthYear: { $gt: ORIONPOKALEN_YEAR }, year: year}).
                 sort({ totalPointsOrion1000: -1, wins: -1 });
     query.exec(function(err, runners) { 
         if (err) {
@@ -17,14 +19,15 @@ router.get("/orionpokalen", function(req, res) {
         } else {
             res.render("orion1000/index", { runners: runners, 
                                             compType: "orionpokalen",
-                                            year: YEAR});
+                                            year: year});
         }
     });
 });
 
-router.get("/orion1000", function(req, res) {
+router.get("/orion1000/:year", function(req, res) {
+    var year = req.params.year;
     var query = Runner.
-                find({totalPointsOrion1000: { $gt: 0 }}).
+                find({totalPointsOrion1000: { $gt: 0 }, year: year}).
                 sort({ totalPointsOrion1000: -1, wins: -1 });
     query.exec(function(err, runners) { 
         if (err) {
@@ -32,15 +35,16 @@ router.get("/orion1000", function(req, res) {
         } else {
             res.render("orion1000/index", { runners: runners, 
                                             compType: "orion1000",
-                                            year: YEAR });
+                                            year: year });
         }
     });
 });
 
 
-router.get("/orion1000/:id", function(req, res) {
+router.get("/orion1000/:id/:year", function(req, res) {
+    var year = req.params.year;
     var query = Runner.
-                find({_id: req.params.id}).
+                find({_id: req.params.id, year: year}).
                 populate("competitions");
     query.exec(function(err, runners) { 
         if (err) {
@@ -51,7 +55,8 @@ router.get("/orion1000/:id", function(req, res) {
     });
 });
 
-router.get("/resultat/runners", function(req, res) {
+router.get("/resultat/runners/:year", function(req, res) {
+    var year = req.params.year;
     var query = Runner.
                 find({ "competitions.0": { "$exists": true} }).
                 sort({ nameFamily: 1, nameGiven: 1 }).
@@ -60,13 +65,13 @@ router.get("/resultat/runners", function(req, res) {
         if (err) {
             console.log(err);
         } else {
-            res.render("resultat/runners", { runners: runners, year: YEAR });
+            res.render("resultat/runners", { runners: runners, year: year });
         }
     });
 });
 
-router.get("/resultat/runners/:id", function(req, res) {
-    // var regexp = new RegExp("^"+ req.params.id);
+router.get("/resultat/runners/:id/:year", function(req, res) {
+    var year = req.params.year;
     var query = Runner.
                 // find({ "competitions.0": { "$exists": true}, nameFamily : regexp }).
                 find({ nameFamily : {$regex : "^" + req.params.id}}).
@@ -76,7 +81,7 @@ router.get("/resultat/runners/:id", function(req, res) {
         if (err) {
             console.log(err);
         } else {
-            res.render("resultat/runners", { runners: runners, year: YEAR });
+            res.render("resultat/runners", { runners: runners, year: year });
         }
     });
 });

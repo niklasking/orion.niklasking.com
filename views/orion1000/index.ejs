@@ -59,7 +59,7 @@
         rowClick:function(e, row){ //trigger an alert message when the row is clicked
             // alert("Row " + row.getData().id + " Clicked!!!!");
             // var url = "/orion1000/" + row.getData().id + "?redirectUrl=" + "orionpokalen";
-            var url = "/orion1000/" + row.getData().id + "?compType=<%= compType %>";
+            var url = "/orion1000/" + row.getData().id + "/<%= year %>?compType=<%= compType %>";
             // window.location(url);
             $(location).attr('href', url);
         },

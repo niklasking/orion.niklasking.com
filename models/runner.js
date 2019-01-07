@@ -15,7 +15,8 @@ var runnerSchema = new mongoose.Schema({
     totalPointsOrion1000: { type: Number, default: 0 },
     totalPointsOrionpokalen: { type: Number, default: 0 },
     wins: { type: Number, default: 0 },
-    orion1000Results: Array
+    orion1000Results: Array,
+    year: String
 });
 
 module.exports = mongoose.model("Runner", runnerSchema);
