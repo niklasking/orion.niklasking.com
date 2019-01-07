@@ -7,7 +7,7 @@ var express     = require('express'),
 var YEAR = 2018;
 var ORIONPOKALEN_YEAR = YEAR - 17;
 
-router.get("/orionpokalen", isLoggedIn, function(req, res) {
+router.get("/orionpokalen", function(req, res) {
     var query = Runner.
                 find({totalPointsOrion1000: { $gt: 0 }, birthYear: { $gt: ORIONPOKALEN_YEAR }}).
                 sort({ totalPointsOrion1000: -1, wins: -1 });
@@ -22,7 +22,7 @@ router.get("/orionpokalen", isLoggedIn, function(req, res) {
     });
 });
 
-router.get("/orion1000", isLoggedIn, function(req, res) {
+router.get("/orion1000", function(req, res) {
     var query = Runner.
                 find({totalPointsOrion1000: { $gt: 0 }}).
                 sort({ totalPointsOrion1000: -1, wins: -1 });
@@ -38,7 +38,7 @@ router.get("/orion1000", isLoggedIn, function(req, res) {
 });
 
 
-router.get("/orion1000/:id", isLoggedIn, function(req, res) {
+router.get("/orion1000/:id", function(req, res) {
     var query = Runner.
                 find({_id: req.params.id}).
                 populate("competitions");
@@ -82,11 +82,10 @@ router.get("/resultat/runners/:id", function(req, res) {
 });
 
 function isLoggedIn(req, res, next) {
-    // if (req.isAuthenticated()) {
-    //     return next();
-    // }
-    // res.redirect("/login");
-    return next();
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect("/login");
 }
 
 module.exports = router;

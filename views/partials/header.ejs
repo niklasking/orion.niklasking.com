@@ -45,6 +45,17 @@
                 </li>
             </ul>
             <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Admin
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="/admin/calendar">Kalendern</a>
+                        <% if (currentUser) { %>
+                        <a class="dropdown-item" href="/admin/runners/refresh:2018">Uppdatera resultat 2018</a>
+                        <% } %>
+                    </div>
+                </li>
                 <% if (currentUser) { %>
                     <li class="nav-item my-2 my-lg-0">
                         <a href=#  class="nav-link"><%= currentUser.nameGiven %> <%= currentUser.nameFamily %></a>
@@ -53,18 +64,10 @@
                         <a href="/logout" class="nav-link">Logga ut</a>
                     </li>
                 <% } else { %>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Admin
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="/admin/calendar">Kalendern</a>
-                        </div>
-                    </li>
                     <li class="nav-item my-2 my-lg-0">
                         <a href="/login" class="nav-link">Logga in</a>
                     </li>
-                    <% } %>
+                <% } %>
             </ul>
         </div>
     </nav>
