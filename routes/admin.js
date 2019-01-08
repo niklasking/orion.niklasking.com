@@ -16,8 +16,6 @@ var API_KEY = "a7ff03d951bf4584a848df74aca6768d";
 // Step 1. Clear all and read all runners
 router.get("/admin/runners/refresh/:year", isLoggedIn, function(req, res) {
     var year = req.params.year;
-    // FIXA TILL SÅ ATT MAN KAN HA FLERA ÅR.
-    // OLIKA COLLECTIONS ELLER OLIKA SÖKMÖNSTER?
     var options = {
         url: 'https://eventor.orientering.se/api/persons/organisations/288',
         headers: {
@@ -32,7 +30,7 @@ router.get("/admin/runners/refresh/:year", isLoggedIn, function(req, res) {
             if (error || response.statusCode != 200) {
                 req.flash("error", "Nu blev det knas i steg 1 :-(");
                 console.log("error 1");
-                reject(err);
+                reject(error);
             } else {
                 console.log("ok 1");
                 data = body;
@@ -42,7 +40,7 @@ router.get("/admin/runners/refresh/:year", isLoggedIn, function(req, res) {
     }).then(function(result) {
     // Remove all members in database
         return new Promise((resolve, reject) => {
-            Runner.remove({year: year}, function(err) {
+            Runner.remove({resultYear: year}, function(err) {
                 if (err) {
                     console.log("error 2");
                     req.flash("error", "Nu blev det knas i steg 2 :-(");
@@ -56,7 +54,7 @@ router.get("/admin/runners/refresh/:year", isLoggedIn, function(req, res) {
     }).then(function(result) {
     // Remove all competitions from database
         return new Promise((resolve, reject) => {
-            Competition.remove({year: year}, function(err) {
+            Competition.remove({resultYear: year}, function(err) {
                 if (err) {
                     console.log("error 3");
                     req.flash("error", "Nu blev det knas i steg 3 :-(");
@@ -91,13 +89,14 @@ router.get("/admin/runners/refresh/:year", isLoggedIn, function(req, res) {
             var runnerBirth         = runner.BirthDate[0].Date;
             var runnerBirthYear     = parseInt(runnerBirth.toString().substring(0, 4));
             var runnerEventorId     = runner.PersonId;
+            console.log(year);
             var newRunner = new Runner({
                 nameGiven: runnerNameGiven,
                 nameFamily: runnerNameFamily,
                 birth: runnerBirth,
                 birthYear: runnerBirthYear,
-                eventorId: runnerEventorId,
-                year: year
+                resultYear: year,
+                eventorId: runnerEventorId
             });
             // console.log("Found runner: " + newRunner.nameGiven + " " + newRunner.nameFamily);
             promises.push(saveRunner(newRunner));
@@ -108,7 +107,7 @@ router.get("/admin/runners/refresh/:year", isLoggedIn, function(req, res) {
                 // Get all members from database.
                 dataPromise = new Promise(function(resolve, reject) {
                     var query = Runner.
-                    find({});
+                    find({resultYear: year});
                     query.exec(function(err, runners) {
                         if (err) {
                             console.log("error 6");
@@ -134,7 +133,7 @@ router.get("/admin/runners/refresh/:year", isLoggedIn, function(req, res) {
                         // Get runners and competitions and start calculating points
                         dataPromise = new Promise(function(resolve, reject) {
                             var query = Runner.
-                                find({ }).
+                                find({resultYear: year }).
                                 populate("competitions");
                             query.exec(function(err, runners) { 
                                 if (err) {
@@ -160,7 +159,7 @@ router.get("/admin/runners/refresh/:year", isLoggedIn, function(req, res) {
                                     // Get runners and competitions and start calculating cups
                                     dataPromise = new Promise(function(resolve, reject) {
                                         var query = Runner.
-                                            find({ }).
+                                            find({resultYear: year }).
                                             populate("competitions");
                                         query.exec(function(err, runners) { 
                                             if (err) {
@@ -346,8 +345,6 @@ function getCompsForRunner(runner, year) {
             } else {
                 getAndSaveCompetitions(runner, body, year);
                 resolve();
-                // parseXMLString(body, function(err, result) {
-                // });
             }
         });
     });
@@ -401,7 +398,7 @@ function getAndSaveCompetitions(runner, body, year) {
                             relay: relay,
                             relayTeam: relayTeam,
                             relayLeg: relayLeg,
-                            year: year
+                            resultYear: year
                         });
                         if (comp.ClassResult[0].PersonResult[0].Organisation != undefined) {
                             if (comp.ClassResult[0].PersonResult[0].Organisation[0].OrganisationId == "288") {
@@ -442,7 +439,7 @@ function getAndSaveCompetitions(runner, body, year) {
                                     relay: relay,
                                     relayTeam: relayTeam,
                                     relayLeg: relayLeg,
-                                    year: year
+                                    resultYear: year
                                 });
                                 if (comp.ClassResult[day].PersonResult[0].Organisation != undefined) {
                                     if (comp.ClassResult[day].PersonResult[0].Organisation[0].OrganisationId == "288") {
@@ -481,7 +478,7 @@ function getAndSaveCompetitions(runner, body, year) {
                                     relay: relay,
                                     relayTeam: relayTeam,
                                     relayLeg: relayLeg,
-                                    year: year
+                                    resultYear: year
                                 });
                                 if (comp.ClassResult[0].PersonResult[0].Organisation != undefined) {
                                     if (comp.ClassResult[0].PersonResult[0].Organisation[0].OrganisationId == "288") {
@@ -514,7 +511,7 @@ function getAndSaveCompetitions(runner, body, year) {
                         relay: relay,
                         relayTeam: relayTeam,
                         relayLeg: relayLeg,
-                        year: year
+                        resultYear: year
                     });
                     if (comp.ClassResult[0].TeamResult[0].Organisation != undefined) {
                         if (comp.ClassResult[0].TeamResult[0].Organisation[0].OrganisationId == "288") {

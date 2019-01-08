@@ -4,7 +4,7 @@ var competitionSchema = new mongoose.Schema({
     eventorId: String,
     name: String,
     date: String,
-    year: String,
+    resultYear: String,
     category: String,
     statusOk: Boolean,
     className: String,

@@ -11,7 +11,7 @@ router.get("/orionpokalen/:year", function(req, res) {
     var year = req.params.year;
     var ORIONPOKALEN_YEAR = year - 17;
     var query = Runner.
-                find({totalPointsOrion1000: { $gt: 0 }, birthYear: { $gt: ORIONPOKALEN_YEAR }, year: year}).
+                find({totalPointsOrion1000: { $gt: 0 }, birthYear: { $gt: ORIONPOKALEN_YEAR }, resultYear: year}).
                 sort({ totalPointsOrion1000: -1, wins: -1 });
     query.exec(function(err, runners) { 
         if (err) {
@@ -27,7 +27,7 @@ router.get("/orionpokalen/:year", function(req, res) {
 router.get("/orion1000/:year", function(req, res) {
     var year = req.params.year;
     var query = Runner.
-                find({totalPointsOrion1000: { $gt: 0 }, year: year}).
+                find({totalPointsOrion1000: { $gt: 0 }, resultYear: year}).
                 sort({ totalPointsOrion1000: -1, wins: -1 });
     query.exec(function(err, runners) { 
         if (err) {
@@ -44,7 +44,7 @@ router.get("/orion1000/:year", function(req, res) {
 router.get("/orion1000/:id/:year", function(req, res) {
     var year = req.params.year;
     var query = Runner.
-                find({_id: req.params.id, year: year}).
+                find({_id: req.params.id, resultYear: year}).
                 populate("competitions");
     query.exec(function(err, runners) { 
         if (err) {
@@ -58,7 +58,7 @@ router.get("/orion1000/:id/:year", function(req, res) {
 router.get("/resultat/runners/:year", function(req, res) {
     var year = req.params.year;
     var query = Runner.
-                find({ "competitions.0": { "$exists": true} }).
+                find({ "competitions.0": { "$exists": true}, resultYear: year }).
                 sort({ nameFamily: 1, nameGiven: 1 }).
                 populate("competitions");
     query.exec(function(err, runners) { 
@@ -74,7 +74,7 @@ router.get("/resultat/runners/:id/:year", function(req, res) {
     var year = req.params.year;
     var query = Runner.
                 // find({ "competitions.0": { "$exists": true}, nameFamily : regexp }).
-                find({ nameFamily : {$regex : "^" + req.params.id}}).
+                find({ nameFamily : {$regex : "^" + req.params.id}, resultYear: year}).
                 sort({ nameFamily: 1, nameGiven: 1 }).
                 populate("competitions");
     query.exec(function(err, runners) { 
