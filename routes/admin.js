@@ -8,12 +8,18 @@ var express         = require('express'),
     Competition     = require('../models/competition'),
     CalendarEvent   = require('../models/calendarEvent');
 
-// var YEAR = 2018;
-// var ORIONPOKALEN_YEAR = YEAR - 17;
 var ORINGEN_ELITSPRINT = 24317;
 var API_KEY = "a7ff03d951bf4584a848df74aca6768d";
 
-// Step 1. Clear all and read all runners
+router.get("/admin/todo", function(req, res) {
+    res.render("admin/todo");
+});
+
+router.get("/admin/calendar/comps/:year", function(req, res) {
+    var year = req.params.year;
+    res.render("admin/comps/index", {year: year});
+});
+
 router.get("/admin/runners/refresh/:year", isLoggedIn, function(req, res) {
     var year = req.params.year;
     var options = {
@@ -89,7 +95,6 @@ router.get("/admin/runners/refresh/:year", isLoggedIn, function(req, res) {
             var runnerBirth         = runner.BirthDate[0].Date;
             var runnerBirthYear     = parseInt(runnerBirth.toString().substring(0, 4));
             var runnerEventorId     = runner.PersonId;
-            console.log(year);
             var newRunner = new Runner({
                 nameGiven: runnerNameGiven,
                 nameFamily: runnerNameFamily,

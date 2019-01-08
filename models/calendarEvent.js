@@ -11,7 +11,9 @@ var calendarEventSchema = new mongoose.Schema({
     ansvarig: String,
     className: String,
     lat: String,
-    lng: String
+    lng: String,
+    eventorId: String,
+    year: String
 });
 
 module.exports = mongoose.model("CalendarEvent", calendarEventSchema);

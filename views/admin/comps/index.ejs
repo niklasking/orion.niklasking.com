@@ -1,0 +1,136 @@
+<% include ../../partials/header %>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin="">
+<script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js" integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg==" crossorigin=""></script>
+
+<div class="container">
+    <h1>Redigera tävlingsprogram <%= year %></h1>
+    <div class="row justify-content-center">
+        <div class="col">
+            <form>
+                <span>Ange tävlingens Eventor id: </span>
+                <input type="text" id="eventorId" required>
+                <input type="button" id="enter" value="Enter">
+                <span id="errorMessage" style="color:red;"></span>
+            </form>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col">
+            <strong>Datum: </strong>
+        </div>
+        <div class="col">
+            <span id="start"></span>
+        </div>
+        <div class="col">
+            <strong>Namn: </strong>
+        </div>
+        <div class="col">
+            <span id="title"></span>
+        </div>
+        <div class="col">
+            <strong>Arrangör: </strong>
+        </div>
+        <div class="col">
+            <span id="ansvarig"></span>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col">
+            <strong>Plats: </strong>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col">
+            <div id="mapid" style="height: 250px;"></div>
+        </div>
+    </div>
+    <div class="row justify-content-left">
+        <form id="addForm" action="" style="visibility: hidden;">
+            <input type="hidden" name="eventorId" id="eventorIdInput">
+            <input type="hidden" name="start" id="startInput">
+            <input type="hidden" name="title" id="titleInput">
+            <input type="hidden" name="ansvarig" id="ansvarigInput">
+            <input type="hidden" name="lat" id="latInput">
+            <input type="hidden" name="lng" id="lngInput">
+            <input class="btn btn-primary ml-3" type="submit" value="Lägg till">
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">            
+    $('#enter').click(function(){  
+        var eventorId = $('#eventorId').val();
+        if (eventorId != "") {
+            $('#errorMessage').text("");
+            $.ajax({
+                url: "/ajax",
+                // type: 'POST',
+                // cache: false, 
+                data: { eventorId: eventorId }, 
+                success: function(data){
+                    if (data.start != "") {                        
+                        $('#start').text(data.start);
+                        $('#title').text(data.title);
+                        $('#ansvarig').text(data.ansvarig);
+                        $('#addForm').attr('style', 'visibility: none;')
+                        $('#eventorIdInput').text(data.eventorId);
+                        $('#startInput').text(data.start);
+                        $('#titleInput').text(data.title);
+                        $('#ansvarigInput').text(data.ansvarig);
+                        $('#latInput').text(data.lat);
+                        $('#lngInput').text(data.lng);
+                        renderMap(data);
+                    } else {
+                        $('#errorMessage').text("Kunde inte hitta " + $('#eventorId').val());
+                        $('#start').text("");
+                        $('#title').text("");
+                        $('#ansvarig').text("");
+                        $('#addForm').attr('style', 'visibility: hidden;')
+                    }
+                },
+                error: function(jqXHR, textStatus, err){
+                    console.log('text status '+textStatus+', err '+err);
+                }
+            });
+        } else {
+            $('#errorMessage').text("Du måste ange ett Eventor id.");
+            $('#start').text("");
+            $('#title').text("");
+            $('#ansvarig').text("");
+        }
+    });            
+</script>
+<script>
+    var mymap;
+    var marker;
+</script>
+<script>
+    function renderMap(data) {
+        var lat = data.lat;
+        var lng = data.lng;
+
+
+        if (mymap == undefined) {
+            mymap = L.map('mapid').setView([lat, lng], 11);
+            L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+                maxZoom: 18,
+                attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+                    '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                    'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                id: 'mapbox.streets'
+            }).addTo(mymap);
+        } else {
+            mymap.setView([lat, lng], 11);
+        }
+
+        if (lat != undefined && lng != undefined) {
+            if (marker != undefined) { // check
+                mymap.removeLayer(marker); // remove
+            }
+            marker = new L.Marker([lat, lng]);
+            marker.addTo(mymap);
+        }
+    }
+</script>
+
+<% include ../../partials/footer %>
