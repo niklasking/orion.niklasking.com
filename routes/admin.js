@@ -15,11 +15,6 @@ router.get("/admin/todo", function(req, res) {
     res.render("admin/todo");
 });
 
-router.get("/admin/calendar/comps/:year", function(req, res) {
-    var year = req.params.year;
-    res.render("admin/comps/index", {year: year});
-});
-
 router.get("/admin/runners/refresh/:year", isLoggedIn, function(req, res) {
     var year = req.params.year;
     var options = {
@@ -246,6 +241,82 @@ router.get("/admin/calendar", function(req, res) {
         }
     });    
 });
+
+router.get("/admin/calendar/comps/fetch", function (req, res){  
+    var id = req.query.eventorId;
+    var options = {
+        url: 'https://eventor.orientering.se/api/event/' + id,
+        headers: {
+        'ApiKey': API_KEY
+        }
+    };
+    request(options, function(error, response, body) {
+        var events = [];
+        if (!error && response.statusCode == 200) {
+            parseXMLString(body, function(err, result) {
+                if (err) {
+                    res.send({events: events});
+                    // res.send({eventorId: "", title: "", start: "", ansvarig: "", lat: "", lng: "", raceType: "", raceDistance: "", raceNight: ""});
+                } else if (result.Event == undefined) {
+                    res.send({events: events});
+                    // res.send({eventorId: "", title: "", start: "", ansvarig: "", lat: "", lng: "", raceType: "", raceDistance: "", raceNight: ""});
+                } else if (result.Event.StartDate == undefined) {
+                    res.send({events: events});
+                    // res.send({eventorId: "", title: "", start: "", ansvarig: "", lat: "", lng: "", raceType: "", raceDistance: "", raceNight: ""});
+                } else {
+                    var multi = false;
+                    for (var i = 0; i < result.Event.EventRace.length; i++) {
+                        var eventorId = result.Event.EventId;
+                        var title = result.Event.Name + " " + result.Event.EventRace[i].Name;
+                        var ansvarig = result.Event.Organiser[0].Organisation[0].Name;
+                        var raceType = result.Event.$.eventForm;
+
+                        var start = result.Event.EventRace[i].RaceDate[0].Date + " " + result.Event.EventRace[i].RaceDate[0].Clock;
+                        var lat = result.Event.EventRace[i].EventCenterPosition[0].$.y;
+                        var lng = result.Event.EventRace[i].EventCenterPosition[0].$.x;
+                        var raceDistance = result.Event.EventRace[i].$.raceDistance;
+                        var raceNight = result.Event.EventRace[i].$.raceLightCondition;
+                        var night = raceNight == "Night" ? true : false;
+                        
+                        events.push(new CalendarEvent({
+                            title: title,
+                            start: start,
+                            link: "https://eventor.orientering.se/Events/Show/" + eventorId,
+                            ansvarig: ansvarig,
+                            className: "eventCompetition",
+                            lat: lat,
+                            lng: lng,
+                            eventorId: eventorId,
+                            year: start.toString().substring(0, 4),
+                            raceType: raceType,
+                            raceDistance: raceDistance,
+                            raceNight: night
+                        }));
+                    }
+                    res.send({events: events});
+                    // res.send({eventorId: eventorId, title: title, start: start, ansvarig: ansvarig, lat: lat, lng: lng, raceType: raceType, raceDistance: raceDistance, raceNight: raceNight, multi: multi});
+                }
+            });
+        } else {
+            if (error != undefined) {
+                console.log(error);
+            }
+            if (response.statusCode != undefined) {
+                res.send({events: events});
+                // res.send({eventorId: "", title: "", start: "", ansvarig: "", lat: "", lng: "", raceType: "", raceDistance: "", raceNight: ""});
+            } else {
+                res.send({events: events});
+                // res.send({eventorId: "", title: "", start: "", ansvarig: "", lat: "", lng: "", raceType: "", raceDistance: "", raceNight: ""});
+            }
+        }
+    }); 
+ });
+
+ router.get("/admin/calendar/comps/:year", function(req, res) {
+    var year = req.params.year;
+    res.render("admin/comps/index", {year: year});
+});
+
 router.post("/admin/calendar", function(req, res) {
     var title = req.body.title;
     var start = req.body.start;

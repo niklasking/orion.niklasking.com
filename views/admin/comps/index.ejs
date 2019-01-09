@@ -1,9 +1,14 @@
 <% include ../../partials/header %>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin="">
 <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js" integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg==" crossorigin=""></script>
+<link rel="stylesheet" href="/static/css/comps.css">
 
 <div class="container">
-    <h1>Redigera tävlingsprogram <%= year %></h1>
+    <div class="row">
+        <div class="col">
+            <h1>Redigera tävlingsprogram <%= year %></h1>
+        </div>
+    </div>
     <div class="row justify-content-center">
         <div class="col">
             <form>
@@ -14,45 +19,286 @@
             </form>
         </div>
     </div>
-    <div class="row justify-content-center">
-        <div class="col">
+    <div class="row infoRow1 hide">
+        <div class="col-2">
             <strong>Datum: </strong>
         </div>
-        <div class="col">
-            <span id="start"></span>
+        <div class="col-10">
+            <span id="start1"></span>
         </div>
-        <div class="col">
+    </div>
+    <div class="row infoRow1 hide">
+        <div class="col-2">
             <strong>Namn: </strong>
         </div>
-        <div class="col">
-            <span id="title"></span>
+        <div class="col-10">
+            <span id="title1"></span>
         </div>
-        <div class="col">
+    </div>
+    <div class="row infoRow1 hide">
+        <div class="col-2">
             <strong>Arrangör: </strong>
         </div>
-        <div class="col">
-            <span id="ansvarig"></span>
+        <div class="col-10">
+            <span id="ansvarig1"></span>
         </div>
     </div>
-    <div class="row justify-content-center">
-        <div class="col">
-            <strong>Plats: </strong>
+    <div class="row infoRow1 hide">
+        <div class="col-2">
+            <strong>Typ: </strong>
+        </div>
+        <div class="col-10">
+            <span id="raceType1"></span>
         </div>
     </div>
-    <div class="row justify-content-center">
-        <div class="col">
-            <div id="mapid" style="height: 250px;"></div>
+    <div class="row infoRow1 hide">
+        <div class="col-2">
+            <strong>Distans: </strong>
+        </div>
+        <div class="col-10">
+            <span id="raceDistance1"></span>
         </div>
     </div>
-    <div class="row justify-content-left">
-        <form id="addForm" action="" style="visibility: hidden;">
-            <input type="hidden" name="eventorId" id="eventorIdInput">
-            <input type="hidden" name="start" id="startInput">
-            <input type="hidden" name="title" id="titleInput">
-            <input type="hidden" name="ansvarig" id="ansvarigInput">
-            <input type="hidden" name="lat" id="latInput">
-            <input type="hidden" name="lng" id="lngInput">
-            <input class="btn btn-primary ml-3" type="submit" value="Lägg till">
+    <div class="row justify-content-center infoRow1 hide">
+        <div class="col">
+            <div id="mapid1" style="height: 250px;"></div>
+        </div>
+    </div>
+
+    <div class="row infoRow2 hide">
+        <div class="col-2">
+            <strong>Datum: </strong>
+        </div>
+        <div class="col-10">
+            <span id="start2"></span>
+        </div>
+    </div>
+    <div class="row infoRow2 hide">
+        <div class="col-2">
+            <strong>Namn: </strong>
+        </div>
+        <div class="col-10">
+            <span id="title2"></span>
+        </div>
+    </div>
+    <div class="row infoRow2 hide">
+        <div class="col-2">
+            <strong>Arrangör: </strong>
+        </div>
+        <div class="col-10">
+            <span id="ansvarig2"></span>
+        </div>
+    </div>
+    <div class="row infoRow2 hide">
+        <div class="col-2">
+            <strong>Typ: </strong>
+        </div>
+        <div class="col-10">
+            <span id="raceType2"></span>
+        </div>
+    </div>
+    <div class="row infoRow2 hide">
+        <div class="col-2">
+            <strong>Distans: </strong>
+        </div>
+        <div class="col-10">
+            <span id="raceDistance2"></span>
+        </div>
+    </div>
+    <div class="row justify-content-center infoRow2 hide">
+        <div class="col">
+            <div id="mapid2" style="height: 250px;"></div>
+        </div>
+    </div>
+
+    <div class="row infoRow3 hide">
+        <div class="col-2">
+            <strong>Datum: </strong>
+        </div>
+        <div class="col-10">
+            <span id="start3"></span>
+        </div>
+    </div>
+    <div class="row infoRow3 hide">
+        <div class="col-2">
+            <strong>Namn: </strong>
+        </div>
+        <div class="col-10">
+            <span id="title3"></span>
+        </div>
+    </div>
+    <div class="row infoRow3 hide">
+        <div class="col-2">
+            <strong>Arrangör: </strong>
+        </div>
+        <div class="col-10">
+            <span id="ansvarig3"></span>
+        </div>
+    </div>
+    <div class="row infoRow3 hide">
+        <div class="col-2">
+            <strong>Typ: </strong>
+        </div>
+        <div class="col-10">
+            <span id="raceType3"></span>
+        </div>
+    </div>
+    <div class="row infoRow3 hide">
+        <div class="col-2">
+            <strong>Distans: </strong>
+        </div>
+        <div class="col-10">
+            <span id="raceDistance3"></span>
+        </div>
+    </div>
+    <div class="row justify-content-center infoRow3 hide">
+        <div class="col">
+            <div id="mapid3" style="height: 250px;"></div>
+        </div>
+    </div>
+
+    <div class="row infoRow4 hide">
+        <div class="col-2">
+            <strong>Datum: </strong>
+        </div>
+        <div class="col-10">
+            <span id="start4"></span>
+        </div>
+    </div>
+    <div class="row infoRow4 hide">
+        <div class="col-2">
+            <strong>Namn: </strong>
+        </div>
+        <div class="col-10">
+            <span id="title4"></span>
+        </div>
+    </div>
+    <div class="row infoRow4 hide">
+        <div class="col-2">
+            <strong>Arrangör: </strong>
+        </div>
+        <div class="col-10">
+            <span id="ansvarig4"></span>
+        </div>
+    </div>
+    <div class="row infoRow4 hide">
+        <div class="col-2">
+            <strong>Typ: </strong>
+        </div>
+        <div class="col-10">
+            <span id="raceType4"></span>
+        </div>
+    </div>
+    <div class="row infoRow4 hide">
+        <div class="col-2">
+            <strong>Distans: </strong>
+        </div>
+        <div class="col-10">
+            <span id="raceDistance4"></span>
+        </div>
+    </div>
+    <div class="row justify-content-center infoRow4 hide">
+        <div class="col">
+            <div id="mapid4" style="height: 250px;"></div>
+        </div>
+    </div>
+
+    <div class="row infoRow5 hide">
+        <div class="col-2">
+            <strong>Datum: </strong>
+        </div>
+        <div class="col-10">
+            <span id="start5"></span>
+        </div>
+    </div>
+    <div class="row infoRow5 hide">
+        <div class="col-2">
+            <strong>Namn: </strong>
+        </div>
+        <div class="col-10">
+            <span id="title5"></span>
+        </div>
+    </div>
+    <div class="row infoRow5 hide">
+        <div class="col-2">
+            <strong>Arrangör: </strong>
+        </div>
+        <div class="col-10">
+            <span id="ansvarig5"></span>
+        </div>
+    </div>
+    <div class="row infoRow5 hide">
+        <div class="col-2">
+            <strong>Typ: </strong>
+        </div>
+        <div class="col-10">
+            <span id="raceType5"></span>
+        </div>
+    </div>
+    <div class="row infoRow5 hide">
+        <div class="col-2">
+            <strong>Distans: </strong>
+        </div>
+        <div class="col-10">
+            <span id="raceDistance5"></span>
+        </div>
+    </div>
+    <div class="row justify-content-center infoRow5 hide">
+        <div class="col">
+            <div id="mapid5" style="height: 250px;"></div>
+        </div>
+    </div>
+
+
+    <div class="row justify-content-left infoRow1 hide">
+        <form id="addForm" action="">
+            <input type="hidden" name="legs" id="legs">
+            <input type="hidden" name="eventorId1" id="eventorIdInput1">
+            <input type="hidden" name="start1" id="startInput1">
+            <input type="hidden" name="title1" id="titleInput1">
+            <input type="hidden" name="ansvarig1" id="ansvarigInput1">
+            <input type="hidden" name="lat1" id="latInput1">
+            <input type="hidden" name="lng1" id="lngInput1">
+            <input type="hidden" name="raceType1" id="raceTypeInput1">
+            <input type="hidden" name="raceDistance1" id="raceDistanceInput1">
+
+            <input type="hidden" name="eventorId2" id="eventorIdInput2">
+            <input type="hidden" name="start2" id="startInput2">
+            <input type="hidden" name="title2" id="titleInput2">
+            <input type="hidden" name="ansvarig2" id="ansvarigInput2">
+            <input type="hidden" name="lat2" id="latInput2">
+            <input type="hidden" name="lng2" id="lngInput2">
+            <input type="hidden" name="raceType2" id="raceTypeInput2">
+            <input type="hidden" name="raceDistance2" id="raceDistanceInput2">
+
+            <input type="hidden" name="eventorId3" id="eventorIdInput3">
+            <input type="hidden" name="start3" id="startInput3">
+            <input type="hidden" name="title3" id="titleInput3">
+            <input type="hidden" name="ansvarig3" id="ansvarigInput3">
+            <input type="hidden" name="lat3" id="latInput3">
+            <input type="hidden" name="lng3" id="lngInput3">
+            <input type="hidden" name="raceType3" id="raceTypeInput3">
+            <input type="hidden" name="raceDistance3" id="raceDistanceInput3">
+
+            <input type="hidden" name="eventorId4" id="eventorIdInput4">
+            <input type="hidden" name="start4" id="startInput4">
+            <input type="hidden" name="title4" id="titleInput4">
+            <input type="hidden" name="ansvarig4" id="ansvarigInput4">
+            <input type="hidden" name="lat4" id="latInput4">
+            <input type="hidden" name="lng4" id="lngInput4">
+            <input type="hidden" name="raceType4" id="raceTypeInput4">
+            <input type="hidden" name="raceDistance4" id="raceDistanceInput4">
+
+            <input type="hidden" name="eventorId5" id="eventorIdInput5">
+            <input type="hidden" name="start5" id="startInput5">
+            <input type="hidden" name="title5" id="titleInput5">
+            <input type="hidden" name="ansvarig5" id="ansvarigInput5">
+            <input type="hidden" name="lat5" id="latInput5">
+            <input type="hidden" name="lng5" id="lngInput5">
+            <input type="hidden" name="raceType5" id="raceTypeInput5">
+            <input type="hidden" name="raceDistance5" id="raceDistanceInput5">
+
+            <input class="btn btn-primary ml-3 mt-3" type="submit" value="Lägg till">
         </form>
     </div>
 </div>
@@ -63,29 +309,221 @@
         if (eventorId != "") {
             $('#errorMessage').text("");
             $.ajax({
-                url: "/ajax",
+                url: "/admin/calendar/comps/fetch",
                 // type: 'POST',
                 // cache: false, 
                 data: { eventorId: eventorId }, 
                 success: function(data){
-                    if (data.start != "") {                        
-                        $('#start').text(data.start);
-                        $('#title').text(data.title);
-                        $('#ansvarig').text(data.ansvarig);
-                        $('#addForm').attr('style', 'visibility: none;')
-                        $('#eventorIdInput').text(data.eventorId);
-                        $('#startInput').text(data.start);
-                        $('#titleInput').text(data.title);
-                        $('#ansvarigInput').text(data.ansvarig);
-                        $('#latInput').text(data.lat);
-                        $('#lngInput').text(data.lng);
-                        renderMap(data);
-                    } else {
+                    // if (data.multi) {
+                    //     $(location).attr('href', '/');
+                    // }
+                    $('.hide').removeClass('hide');
+                    if (data.events.length == 0) {
                         $('#errorMessage').text("Kunde inte hitta " + $('#eventorId').val());
-                        $('#start').text("");
-                        $('#title').text("");
-                        $('#ansvarig').text("");
-                        $('#addForm').attr('style', 'visibility: hidden;')
+                        $('#start1').text("");
+                        $('#title1').text("");
+                        $('#ansvarig1').text("");
+                        $('#raceType1').text("");
+                        $('#raceDistance1').text("");
+                        $('.infoRow1').hide();
+
+                        $('#start2').text("");
+                        $('#title2').text("");
+                        $('#ansvarig2').text("");
+                        $('#raceType2').text("");
+                        $('#raceDistance2').text("");
+                        $('.infoRow2').hide();
+
+                        $('#start3').text("");
+                        $('#title3').text("");
+                        $('#ansvarig3').text("");
+                        $('#raceType3').text("");
+                        $('#raceDistance3').text("");
+                        $('.infoRow3').hide();
+
+                        $('#start4').text("");
+                        $('#title4').text("");
+                        $('#ansvarig4').text("");
+                        $('#raceType4').text("");
+                        $('#raceDistance4').text("");
+                        $('.infoRow4').hide();
+
+                        $('#start5').text("");
+                        $('#title5').text("");
+                        $('#ansvarig5').text("");
+                        $('#raceType5').text("");
+                        $('#raceDistance5').text("");
+                        $('.infoRow5').hide();
+                    } else {
+                        if (data.events.length > 0 && data.events[0].start != "") {
+                            var i = 0;
+                            var type = ((data.events[i].raceType == "RelaySingleDay" || data.events[i].raceType == "RelayMultiDay") ? "Stafett" : ((data.events[i].raceType == "IndMultiDay") ? "Flerdagars" : "Individuellt"));
+                            var distans = "Lång";
+                            switch (data.events[i].raceDistance) {
+                                case "Middle":
+                                    distans = "Medel";
+                                    break;
+                                case "UltraLong":
+                                    distans = "Ultralång";
+                                    break;
+                                case "Sprint":
+                                    distans = "Sprint";
+                                    break;
+                            }
+                            $('.infoRow2').hide();
+                            $('.infoRow3').hide();
+                            $('.infoRow4').hide();
+                            $('.infoRow5').hide();
+                            $('#start1').text(data.events[0].start);
+                            $('#title1').text(data.events[0].title);
+                            $('#ansvarig1').text(data.events[0].ansvarig);
+                            $('#raceType1').text(type + (data.events[0].raceNight ? " natt" : ""));
+                            $('#raceDistance1').text(distans);
+                            $('.infoRow1').show();
+
+                            $('#legs').text("1");
+                            $('#eventorIdInput1').text(data.events[0].eventorId);
+                            $('#startInput1').text(data.events[0].start);
+                            $('#titleInput1').text(data.events[0].title);
+                            $('#ansvarigInput1').text(data.events[0].ansvarig);
+                            $('#latInput1').text(data.events[0].lat);
+                            $('#lngInput1').text(data.events[0].lng);
+                            $('#raceTypeInput1').text(data.events[0].raceType);
+                            $('#raceDistanceInput1').text(data.events[0].raceDistance);
+                            renderMap(data.events[0], 1);
+                        }
+                        if (data.events.length > 1 && data.events[1].start != "") {
+                            var i = 1;
+                            var type = ((data.events[i].raceType == "RelaySingleDay" || data.events[i].raceType == "RelayMultiDay") ? "Stafett" : ((data.events[i].raceType == "IndMultiDay") ? "Flerdagars" : "Individuellt"));
+                            var distans = "Lång";
+                            switch (data.events[i].raceDistance) {
+                                case "Middle":
+                                    distans = "Medel";
+                                    break;
+                                case "UltraLong":
+                                    distans = "Ultralång";
+                                    break;
+                                case "Sprint":
+                                    distans = "Sprint";
+                                    break;
+                            }
+                            $('#start2').text(data.events[i].start);
+                            $('#title2').text(data.events[i].title);
+                            $('#ansvarig2').text(data.events[i].ansvarig);
+                            $('#raceType2').text(type + (data.events[i].raceNight ? " natt" : ""));
+                            $('#raceDistance2').text(distans);
+                            $('.infoRow2').show();
+
+                            $('#legs').text("2");
+                            $('#eventorIdInput2').text(data.events[i].eventorId);
+                            $('#startInput2').text(data.events[i].start);
+                            $('#titleInput2').text(data.events[i].title);
+                            $('#ansvarigInput2').text(data.events[i].ansvarig);
+                            $('#latInput2').text(data.events[i].lat);
+                            $('#lngInput2').text(data.events[i].lng);
+                            $('#raceTypeInput2').text(data.events[i].raceType);
+                            $('#raceDistanceInput2').text(data.events[i].raceDistance);
+                            renderMap(data.events[i], 2);
+                        }
+                        if (data.events.length > 2 && data.events[2].start != "") {
+                            var i = 2;
+                            var type = ((data.events[i].raceType == "RelaySingleDay" || data.events[i].raceType == "RelayMultiDay") ? "Stafett" : ((data.events[i].raceType == "IndMultiDay") ? "Flerdagars" : "Individuellt"));
+                            var distans = "Lång";
+                            switch (data.events[i].raceDistance) {
+                                case "Middle":
+                                    distans = "Medel";
+                                    break;
+                                case "UltraLong":
+                                    distans = "Ultralång";
+                                    break;
+                                case "Sprint":
+                                    distans = "Sprint";
+                                    break;
+                            }
+                            $('#start3').text(data.events[i].start);
+                            $('#title3').text(data.events[i].title);
+                            $('#ansvarig3').text(data.events[i].ansvarig);
+                            $('#raceType3').text(type + (data.events[i].raceNight ? " natt" : ""));
+                            $('#raceDistance3').text(distans);
+                            $('.infoRow3').show();
+
+                            $('#legs').text("3");
+                            $('#eventorIdInput3').text(data.events[i].eventorId);
+                            $('#startInput3').text(data.events[i].start);
+                            $('#titleInput3').text(data.events[i].title);
+                            $('#ansvarigInput3').text(data.events[i].ansvarig);
+                            $('#latInput3').text(data.events[i].lat);
+                            $('#lngInput3').text(data.events[i].lng);
+                            $('#raceTypeInput3').text(data.events[i].raceType);
+                            $('#raceDistanceInput3').text(data.events[i].raceDistance);
+                            renderMap(data.events[i], 3);
+                        }
+                        if (data.events.length > 3 && data.events[3].start != "") {
+                            var i = 3;
+                            var type = ((data.events[i].raceType == "RelaySingleDay" || data.events[i].raceType == "RelayMultiDay") ? "Stafett" : ((data.events[i].raceType == "IndMultiDay") ? "Flerdagars" : "Individuellt"));
+                            var distans = "Lång";
+                            switch (data.events[i].raceDistance) {
+                                case "Middle":
+                                    distans = "Medel";
+                                    break;
+                                case "UltraLong":
+                                    distans = "Ultralång";
+                                    break;
+                                case "Sprint":
+                                    distans = "Sprint";
+                                    break;
+                            }
+                            $('#start4').text(data.events[i].start);
+                            $('#title4').text(data.events[i].title);
+                            $('#ansvarig4').text(data.events[i].ansvarig);
+                            $('#raceType4').text(type + (data.events[i].raceNight ? " natt" : ""));
+                            $('#raceDistance4').text(distans);
+                            $('.infoRow4').show();
+
+                            $('#legs').text("4");
+                            $('#eventorIdInput4').text(data.events[i].eventorId);
+                            $('#startInput4').text(data.events[i].start);
+                            $('#titleInput4').text(data.events[i].title);
+                            $('#ansvarigInput4').text(data.events[i].ansvarig);
+                            $('#latInput4').text(data.events[i].lat);
+                            $('#lngInput4').text(data.events[i].lng);
+                            $('#raceTypeInput4').text(data.events[i].raceType);
+                            $('#raceDistanceInput4').text(data.events[i].raceDistance);
+                            renderMap(data.events[i], 4);
+                        }
+                        if (data.events.length > 4 && data.events[4].start != "") {
+                            var i = 4;
+                            var type = ((data.events[i].raceType == "RelaySingleDay" || data.events[i].raceType == "RelayMultiDay") ? "Stafett" : ((data.events[i].raceType == "IndMultiDay") ? "Flerdagars" : "Individuellt"));
+                            var distans = "Lång";
+                            switch (data.events[i].raceDistance) {
+                                case "Middle":
+                                    distans = "Medel";
+                                    break;
+                                case "UltraLong":
+                                    distans = "Ultralång";
+                                    break;
+                                case "Sprint":
+                                    distans = "Sprint";
+                                    break;
+                            }
+                            $('#start5').text(data.events[i].start);
+                            $('#title5').text(data.events[i].title);
+                            $('#ansvarig5').text(data.events[i].ansvarig);
+                            $('#raceType5').text(type + (data.events[i].raceNight ? " natt" : ""));
+                            $('#raceDistance5').text(distans);
+                            $('.infoRow5').show();
+
+                            $('#legs').text("5");
+                            $('#eventorIdInput5').text(data.events[i].eventorId);
+                            $('#startInput5').text(data.events[i].start);
+                            $('#titleInput5').text(data.events[i].title);
+                            $('#ansvarigInput5').text(data.events[i].ansvarig);
+                            $('#latInput5').text(data.events[i].lat);
+                            $('#lngInput5').text(data.events[i].lng);
+                            $('#raceTypeInput5').text(data.events[i].raceType);
+                            $('#raceDistanceInput5').text(data.events[i].raceDistance);
+                            renderMap(data.events[i], 5);
+                        }
                     }
                 },
                 error: function(jqXHR, textStatus, err){
@@ -94,41 +532,141 @@
             });
         } else {
             $('#errorMessage').text("Du måste ange ett Eventor id.");
-            $('#start').text("");
-            $('#title').text("");
-            $('#ansvarig').text("");
+            $('.infoRow1').hide();
+            $('.infoRow2').hide();
+            $('.infoRow3').hide();
+            $('.infoRow4').hide();
+            $('.infoRow5').hide();
         }
     });            
 </script>
 <script>
-    var mymap;
-    var marker;
+    var mymap1;
+    var marker1;
+    var mymap2;
+    var marker2;
+    var mymap3;
+    var marker3;
+    var mymap4;
+    var marker4;
+    var mymap5;
+    var marker5;
 </script>
 <script>
-    function renderMap(data) {
-        var lat = data.lat;
-        var lng = data.lng;
+    function renderMap(event, pos) {
+        var lat = event.lat;
+        var lng = event.lng;
 
 
-        if (mymap == undefined) {
-            mymap = L.map('mapid').setView([lat, lng], 11);
-            L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
-                maxZoom: 18,
-                attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
-                    '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-                    'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-                id: 'mapbox.streets'
-            }).addTo(mymap);
-        } else {
-            mymap.setView([lat, lng], 11);
-        }
-
-        if (lat != undefined && lng != undefined) {
-            if (marker != undefined) { // check
-                mymap.removeLayer(marker); // remove
+        if (pos == 1) {
+            if (mymap1 == undefined) {
+                mymap1 = L.map('mapid1').setView([lat, lng], 11);
+                L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+                    maxZoom: 18,
+                    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+                        '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                        'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                    id: 'mapbox.streets'
+                }).addTo(mymap1);
+            } else {
+                mymap1.setView([lat, lng], 11);
             }
-            marker = new L.Marker([lat, lng]);
-            marker.addTo(mymap);
+
+            if (lat != undefined && lng != undefined) {
+                if (marker1 != undefined) { // check
+                    mymap1.removeLayer(marker1); // remove
+                }
+                marker1 = new L.Marker([lat, lng]);
+                marker1.addTo(mymap1);
+            }
+        }
+        else if (pos == 2) {
+            if (mymap2 == undefined) {
+                mymap2 = L.map('mapid2').setView([lat, lng], 11);
+                L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+                    maxZoom: 18,
+                    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+                        '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                        'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                    id: 'mapbox.streets'
+                }).addTo(mymap2);
+            } else {
+                mymap2.setView([lat, lng], 11);
+            }
+
+            if (lat != undefined && lng != undefined) {
+                if (marker2 != undefined) { // check
+                    mymap2.removeLayer(marker2); // remove
+                }
+                marker2 = new L.Marker([lat, lng]);
+                marker2.addTo(mymap2);
+            }
+        }
+        else if (pos == 3) {
+            if (mymap3 == undefined) {
+                mymap3 = L.map('mapid3').setView([lat, lng], 11);
+                L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+                    maxZoom: 18,
+                    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+                        '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                        'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                    id: 'mapbox.streets'
+                }).addTo(mymap3);
+            } else {
+                mymap3.setView([lat, lng], 11);
+            }
+
+            if (lat != undefined && lng != undefined) {
+                if (marker3 != undefined) { // check
+                    mymap3.removeLayer(marker3); // remove
+                }
+                marker3 = new L.Marker([lat, lng]);
+                marker3.addTo(mymap3);
+            }
+        }
+        else if (pos == 4) {
+            if (mymap4 == undefined) {
+                mymap4 = L.map('mapid4').setView([lat, lng], 11);
+                L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+                    maxZoom: 18,
+                    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+                        '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                        'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                    id: 'mapbox.streets'
+                }).addTo(mymap4);
+            } else {
+                mymap4.setView([lat, lng], 11);
+            }
+
+            if (lat != undefined && lng != undefined) {
+                if (marker4 != undefined) { // check
+                    mymap4.removeLayer(marker4); // remove
+                }
+                marker4 = new L.Marker([lat, lng]);
+                marker4.addTo(mymap4);
+            }
+        }
+        else if (pos == 5) {
+            if (mymap5 == undefined) {
+                mymap5 = L.map('mapid5').setView([lat, lng], 11);
+                L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+                    maxZoom: 18,
+                    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+                        '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                        'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                    id: 'mapbox.streets'
+                }).addTo(mymap5);
+            } else {
+                mymap5.setView([lat, lng], 11);
+            }
+
+            if (lat != undefined && lng != undefined) {
+                if (marker5 != undefined) { // check
+                    mymap5.removeLayer(marker4); // remove
+                }
+                marker5 = new L.Marker([lat, lng]);
+                marker5.addTo(mymap5);
+            }
         }
     }
 </script>

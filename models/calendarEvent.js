@@ -13,7 +13,27 @@ var calendarEventSchema = new mongoose.Schema({
     lat: String,
     lng: String,
     eventorId: String,
-    year: String
+    year: String,
+    raceType: String,
+    raceDistance: String,
+    raceNight: Boolean
 });
 
 module.exports = mongoose.model("CalendarEvent", calendarEventSchema);
+
+// raceType:
+//  RelaySingleDay
+//  IndSingleDay
+//  IndMultiDay
+//
+// raceDistance:
+//  Long
+//  Middle
+//  UltraLong
+//  Sprint
+//
+// className:
+//  eventTraining
+//  eventCompetition
+//  eventMeeting
+//  eventImportant
