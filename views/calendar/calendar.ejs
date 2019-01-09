@@ -27,14 +27,14 @@
             // gotoDate: showDate,
             events: <%- JSON.stringify(event_list) %>,
             eventClick: function(calEvent, jsEvent, view) {
-                location.replace("/kalender?title=" + calEvent.title + 
+                location.replace("/kalender?title=" + encodeURIComponent(calEvent.title) + 
                     "&date=" + moment(calEvent.start).format("YYYY-MM-DD HH:mm") +
                     "&className=" + calEvent.className +
                     "&lat=" + calEvent.lat +
                     "&lng=" + calEvent.lng +
                     "&link=" + calEvent.link +
-                    "&ansvarig=" + calEvent.ansvarig +
-                    "&description=" + calEvent.description + 
+                    "&ansvarig=" + encodeURIComponent(calEvent.ansvarig) +
+                    "&description=" + encodeURIComponent(calEvent.description) + 
                     "&eventorId=" + calEvent.eventorId +
                     "&raceType=" + calEvent.raceType +
                     "&raceDistance=" + calEvent.raceDistance +

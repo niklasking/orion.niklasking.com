@@ -434,7 +434,7 @@ router.post("/admin/calendar/comps", function(req, res) {
 });
 
 router.post("/admin/calendar", function(req, res) {
-    var title = req.body.title;
+    var title = decodeURIComponent(req.body.title);
     var start = req.body.start;
     var className = req.body.className;
     var link = req.body.link;
@@ -443,12 +443,6 @@ router.post("/admin/calendar", function(req, res) {
     var lat = req.body.lat;
     var lng = req.body.lng;
     if (req.body.new != undefined) {
-        // SKAPA EN NY AKTIVITET
-
-        // var author = {
-        //     id: req.user._id,
-        //     username: req.user.username
-        // };
         var newCalendarEvent = {title: title, start: start, className: className, lat: lat, lng: lng, ansvarig: ansvarig, link: link, description: description};
         CalendarEvent.create(newCalendarEvent, function(err, justCreatedCalendarEvent) {
             if(err) {
