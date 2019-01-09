@@ -37,12 +37,15 @@ router.get("/kalender", function(req, res) {
     var ansvarig = req.query.ansvarig;
     var link = req.query.link;
     var description = req.query.description;
+    var eventorId = req.query.eventorId;
+    var raceType = req.query.raceType;
+    var raceDistance = req.query.raceDistance;
     CalendarEvent.find({}, function(err, events) {
         if(err) {
             console.log(err);
         }
         else {
-            res.render("calendar/calendar", {event_list: events, date: date, _id: _id, className: className, lat: lat, lng: lng, title: title, ansvarig: ansvarig, link: link, description: description});
+            res.render("calendar/calendar", {event_list: events, date: date, _id: _id, className: className, lat: lat, lng: lng, title: title, ansvarig: ansvarig, link: link, description: description, eventorId: eventorId, raceType: raceType, raceDistance: raceDistance});
         }
     });    
 });

@@ -7,6 +7,11 @@
 
 <script>
     $(function() {
+        // var inputDate = <%= date %>;
+        // var showDate = moment(Date.now());
+        // if (inputDate != undefined) {
+        //     showDate = calEvent.start;
+        // }
         $('#calendar').fullCalendar({
             locale: 'sv',
             firstDay: 1,
@@ -19,6 +24,7 @@
                 center: 'title',
                 right: 'today,prev,next'
             },
+            // gotoDate: showDate,
             events: <%- JSON.stringify(event_list) %>,
             eventClick: function(calEvent, jsEvent, view) {
                 location.replace("/kalender?title=" + calEvent.title + 
@@ -29,6 +35,9 @@
                     "&link=" + calEvent.link +
                     "&ansvarig=" + calEvent.ansvarig +
                     "&description=" + calEvent.description + 
+                    "&eventorId=" + calEvent.eventorId +
+                    "&raceType=" + calEvent.raceType +
+                    "&raceDistance=" + calEvent.raceDistance +
                     "&_id=" + calEvent._id);
             },
             eventRender: function(event, eventElement) {
@@ -63,7 +72,7 @@
                 <%= date %>
             </div>
         </div>
-        <% if (description != undefined && description.length > 0) { %>
+        <% if (description != undefined && description.length > 0 && description != "undefined") { %>
             <div class="row">
                 <div class="col my-3">
                     <%= description %>
@@ -73,10 +82,34 @@
         <% if (ansvarig != undefined && ansvarig.length > 0) { %>
             <div class="row">
                 <div class="col-2">
-                    <strong>Ansvarig:</strong>
+                    <% if (eventorId != undefined) { %>
+                        <strong>Arrangör:</strong>
+                    <% } else { %>
+                        <strong>Ansvarig:</strong>
+                    <% } %>
                 </div>
                 <div class="col-10">
                     <%= ansvarig %>
+                </div>
+            </div>
+        <% } %>
+        <% if (raceType != undefined && raceType != "undefined") { %>
+            <div class="row">
+                <div class="col-2">
+                    <strong>Typ:</strong>
+                </div>
+                <div class="col-10">
+                    <%= raceType %>
+                </div>
+            </div>
+        <% } %>
+        <% if (raceDistance != undefined && raceDistance != "undefined") { %>
+            <div class="row">
+                <div class="col-2">
+                    <strong>Distans:</strong>
+                </div>
+                <div class="col-10">
+                    <%= raceDistance %>
                 </div>
             </div>
         <% } %>

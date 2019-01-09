@@ -4,11 +4,29 @@
 <link rel="stylesheet" href="/static/css/comps.css">
 
 <div class="container">
-    <div class="row">
+    <div class="row justify-content-center">
         <div class="col">
-            <h1>Redigera tävlingsprogram <%= year %></h1>
+            <h1>Tävlingsprogram <%= year %></h1>
         </div>
     </div>
+    <% for (var i = 0; i < comps.length; i++) { %>
+        <div class="row mt-2">
+            <div class="col align-self-center">
+                <span><%= comps[i].start.toString().substring(0, 10) %></span>
+            </div>
+            <div class="col align-self-center">
+                <span><%= comps[i].title %></span>
+            </div>
+            <div class="btn btn-primary">Ta bort</div>
+        </div>
+    <% } %>
+    <div class="row">
+        <div class="col">
+            <hr>
+            <h1>Lägg till en tävling till tävlingspgrogrammet <%= year %></h1>
+        </div>
+    </div>
+
     <div class="row justify-content-center">
         <div class="col">
             <form>
@@ -250,9 +268,10 @@
     </div>
 
 
-    <div class="row justify-content-left infoRow1 hide">
-        <form id="addForm" action="">
+    <div class="row justify-content-left infoRow1 hide mb-3">
+        <form id="addForm" action="/admin/calendar/comps" method="POST">
             <input type="hidden" name="legs" id="legs">
+
             <input type="hidden" name="eventorId1" id="eventorIdInput1">
             <input type="hidden" name="start1" id="startInput1">
             <input type="hidden" name="title1" id="titleInput1">
@@ -298,7 +317,7 @@
             <input type="hidden" name="raceType5" id="raceTypeInput5">
             <input type="hidden" name="raceDistance5" id="raceDistanceInput5">
 
-            <input class="btn btn-primary ml-3 mt-3" type="submit" value="Lägg till">
+            <input class="btn btn-primary ml-3 mt-3" type="submit" value="Lägg till tävling">
         </form>
     </div>
 </div>
@@ -358,6 +377,7 @@
                         if (data.events.length > 0 && data.events[0].start != "") {
                             var i = 0;
                             var type = ((data.events[i].raceType == "RelaySingleDay" || data.events[i].raceType == "RelayMultiDay") ? "Stafett" : ((data.events[i].raceType == "IndMultiDay") ? "Flerdagars" : "Individuellt"));
+                            type = type + (data.events[i].raceNight ? " natt" : "");
                             var distans = "Lång";
                             switch (data.events[i].raceDistance) {
                                 case "Middle":
@@ -377,24 +397,25 @@
                             $('#start1').text(data.events[0].start);
                             $('#title1').text(data.events[0].title);
                             $('#ansvarig1').text(data.events[0].ansvarig);
-                            $('#raceType1').text(type + (data.events[0].raceNight ? " natt" : ""));
+                            $('#raceType1').text(type);
                             $('#raceDistance1').text(distans);
                             $('.infoRow1').show();
 
-                            $('#legs').text("1");
-                            $('#eventorIdInput1').text(data.events[0].eventorId);
-                            $('#startInput1').text(data.events[0].start);
-                            $('#titleInput1').text(data.events[0].title);
-                            $('#ansvarigInput1').text(data.events[0].ansvarig);
-                            $('#latInput1').text(data.events[0].lat);
-                            $('#lngInput1').text(data.events[0].lng);
-                            $('#raceTypeInput1').text(data.events[0].raceType);
-                            $('#raceDistanceInput1').text(data.events[0].raceDistance);
+                            $('#legs').val("1");
+                            $('#eventorIdInput1').val(data.events[0].eventorId);
+                            $('#startInput1').val(data.events[0].start);
+                            $('#titleInput1').val(data.events[0].title);
+                            $('#ansvarigInput1').val(data.events[0].ansvarig);
+                            $('#latInput1').val(data.events[0].lat);
+                            $('#lngInput1').val(data.events[0].lng);
+                            $('#raceTypeInput1').val(type);
+                            $('#raceDistanceInput1').val(distans);
                             renderMap(data.events[0], 1);
                         }
                         if (data.events.length > 1 && data.events[1].start != "") {
                             var i = 1;
                             var type = ((data.events[i].raceType == "RelaySingleDay" || data.events[i].raceType == "RelayMultiDay") ? "Stafett" : ((data.events[i].raceType == "IndMultiDay") ? "Flerdagars" : "Individuellt"));
+                            type = type + (data.events[i].raceNight ? " natt" : "");
                             var distans = "Lång";
                             switch (data.events[i].raceDistance) {
                                 case "Middle":
@@ -410,24 +431,25 @@
                             $('#start2').text(data.events[i].start);
                             $('#title2').text(data.events[i].title);
                             $('#ansvarig2').text(data.events[i].ansvarig);
-                            $('#raceType2').text(type + (data.events[i].raceNight ? " natt" : ""));
+                            $('#raceType2').text(type);
                             $('#raceDistance2').text(distans);
                             $('.infoRow2').show();
 
-                            $('#legs').text("2");
-                            $('#eventorIdInput2').text(data.events[i].eventorId);
-                            $('#startInput2').text(data.events[i].start);
-                            $('#titleInput2').text(data.events[i].title);
-                            $('#ansvarigInput2').text(data.events[i].ansvarig);
-                            $('#latInput2').text(data.events[i].lat);
-                            $('#lngInput2').text(data.events[i].lng);
-                            $('#raceTypeInput2').text(data.events[i].raceType);
-                            $('#raceDistanceInput2').text(data.events[i].raceDistance);
+                            $('#legs').val("2");
+                            $('#eventorIdInput2').val(data.events[i].eventorId);
+                            $('#startInput2').val(data.events[i].start);
+                            $('#titleInput2').val(data.events[i].title);
+                            $('#ansvarigInput2').val(data.events[i].ansvarig);
+                            $('#latInput2').val(data.events[i].lat);
+                            $('#lngInput2').val(data.events[i].lng);
+                            $('#raceTypeInput2').val(type);
+                            $('#raceDistanceInput2').val(distans);
                             renderMap(data.events[i], 2);
                         }
                         if (data.events.length > 2 && data.events[2].start != "") {
                             var i = 2;
                             var type = ((data.events[i].raceType == "RelaySingleDay" || data.events[i].raceType == "RelayMultiDay") ? "Stafett" : ((data.events[i].raceType == "IndMultiDay") ? "Flerdagars" : "Individuellt"));
+                            type = type + (data.events[i].raceNight ? " natt" : "");
                             var distans = "Lång";
                             switch (data.events[i].raceDistance) {
                                 case "Middle":
@@ -443,24 +465,25 @@
                             $('#start3').text(data.events[i].start);
                             $('#title3').text(data.events[i].title);
                             $('#ansvarig3').text(data.events[i].ansvarig);
-                            $('#raceType3').text(type + (data.events[i].raceNight ? " natt" : ""));
+                            $('#raceType3').text(type);
                             $('#raceDistance3').text(distans);
                             $('.infoRow3').show();
 
-                            $('#legs').text("3");
-                            $('#eventorIdInput3').text(data.events[i].eventorId);
-                            $('#startInput3').text(data.events[i].start);
-                            $('#titleInput3').text(data.events[i].title);
-                            $('#ansvarigInput3').text(data.events[i].ansvarig);
-                            $('#latInput3').text(data.events[i].lat);
-                            $('#lngInput3').text(data.events[i].lng);
-                            $('#raceTypeInput3').text(data.events[i].raceType);
-                            $('#raceDistanceInput3').text(data.events[i].raceDistance);
+                            $('#legs').val("3");
+                            $('#eventorIdInput3').val(data.events[i].eventorId);
+                            $('#startInput3').val(data.events[i].start);
+                            $('#titleInput3').val(data.events[i].title);
+                            $('#ansvarigInput3').val(data.events[i].ansvarig);
+                            $('#latInput3').val(data.events[i].lat);
+                            $('#lngInput3').val(data.events[i].lng);
+                            $('#raceTypeInput3').val(type);
+                            $('#raceDistanceInput3').val(distans);
                             renderMap(data.events[i], 3);
                         }
                         if (data.events.length > 3 && data.events[3].start != "") {
                             var i = 3;
                             var type = ((data.events[i].raceType == "RelaySingleDay" || data.events[i].raceType == "RelayMultiDay") ? "Stafett" : ((data.events[i].raceType == "IndMultiDay") ? "Flerdagars" : "Individuellt"));
+                            type = type + (data.events[i].raceNight ? " natt" : "");
                             var distans = "Lång";
                             switch (data.events[i].raceDistance) {
                                 case "Middle":
@@ -476,24 +499,25 @@
                             $('#start4').text(data.events[i].start);
                             $('#title4').text(data.events[i].title);
                             $('#ansvarig4').text(data.events[i].ansvarig);
-                            $('#raceType4').text(type + (data.events[i].raceNight ? " natt" : ""));
+                            $('#raceType4').text(type);
                             $('#raceDistance4').text(distans);
                             $('.infoRow4').show();
 
-                            $('#legs').text("4");
-                            $('#eventorIdInput4').text(data.events[i].eventorId);
-                            $('#startInput4').text(data.events[i].start);
-                            $('#titleInput4').text(data.events[i].title);
-                            $('#ansvarigInput4').text(data.events[i].ansvarig);
-                            $('#latInput4').text(data.events[i].lat);
-                            $('#lngInput4').text(data.events[i].lng);
-                            $('#raceTypeInput4').text(data.events[i].raceType);
-                            $('#raceDistanceInput4').text(data.events[i].raceDistance);
+                            $('#legs').val("4");
+                            $('#eventorIdInput4').val(data.events[i].eventorId);
+                            $('#startInput4').val(data.events[i].start);
+                            $('#titleInput4').val(data.events[i].title);
+                            $('#ansvarigInput4').val(data.events[i].ansvarig);
+                            $('#latInput4').val(data.events[i].lat);
+                            $('#lngInput4').val(data.events[i].lng);
+                            $('#raceTypeInput4').val(type);
+                            $('#raceDistanceInput4').val(distans);
                             renderMap(data.events[i], 4);
                         }
                         if (data.events.length > 4 && data.events[4].start != "") {
                             var i = 4;
                             var type = ((data.events[i].raceType == "RelaySingleDay" || data.events[i].raceType == "RelayMultiDay") ? "Stafett" : ((data.events[i].raceType == "IndMultiDay") ? "Flerdagars" : "Individuellt"));
+                            type = type + (data.events[i].raceNight ? " natt" : "");
                             var distans = "Lång";
                             switch (data.events[i].raceDistance) {
                                 case "Middle":
@@ -509,19 +533,19 @@
                             $('#start5').text(data.events[i].start);
                             $('#title5').text(data.events[i].title);
                             $('#ansvarig5').text(data.events[i].ansvarig);
-                            $('#raceType5').text(type + (data.events[i].raceNight ? " natt" : ""));
+                            $('#raceType5').text(type);
                             $('#raceDistance5').text(distans);
                             $('.infoRow5').show();
 
-                            $('#legs').text("5");
-                            $('#eventorIdInput5').text(data.events[i].eventorId);
-                            $('#startInput5').text(data.events[i].start);
-                            $('#titleInput5').text(data.events[i].title);
-                            $('#ansvarigInput5').text(data.events[i].ansvarig);
-                            $('#latInput5').text(data.events[i].lat);
-                            $('#lngInput5').text(data.events[i].lng);
-                            $('#raceTypeInput5').text(data.events[i].raceType);
-                            $('#raceDistanceInput5').text(data.events[i].raceDistance);
+                            $('#legs').val("5");
+                            $('#eventorIdInput5').val(data.events[i].eventorId);
+                            $('#startInput5').val(data.events[i].start);
+                            $('#titleInput5').val(data.events[i].title);
+                            $('#ansvarigInput5').val(data.events[i].ansvarig);
+                            $('#latInput5').val(data.events[i].lat);
+                            $('#lngInput5').val(data.events[i].lng);
+                            $('#raceTypeInput5').val(type);
+                            $('#raceDistanceInput5').val(distans);
                             renderMap(data.events[i], 5);
                         }
                     }

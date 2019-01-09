@@ -231,13 +231,15 @@ router.get("/admin/calendar", function(req, res) {
     var description = req.query.description;
     var lat = req.query.lat;
     var lng = req.query.lng;
+    var eventorId = req.query.eventorId;
     CalendarEvent.find({}, function(err, events) {
         if(err) {
             req.flash("error", "Nu blev det nåt knas :-(");
             console.log(err);
+            res.redirect("/");
         }
         else {
-            res.render("admin/calendar/new", {event_list: events, date: date, _id: _id, title: title, className: className, lat: lat, lng: lng, ansvarig: ansvarig, link: link, description: description});
+            res.render("admin/calendar/new", {event_list: events, date: date, _id: _id, title: title, className: className, lat: lat, lng: lng, ansvarig: ansvarig, link: link, description: description, eventorId: eventorId});
         }
     });    
 });
@@ -264,7 +266,6 @@ router.get("/admin/calendar/comps/fetch", function (req, res){
                     res.send({events: events});
                     // res.send({eventorId: "", title: "", start: "", ansvarig: "", lat: "", lng: "", raceType: "", raceDistance: "", raceNight: ""});
                 } else {
-                    var multi = false;
                     for (var i = 0; i < result.Event.EventRace.length; i++) {
                         var eventorId = result.Event.EventId;
                         var title = result.Event.Name + " " + result.Event.EventRace[i].Name;
@@ -314,7 +315,122 @@ router.get("/admin/calendar/comps/fetch", function (req, res){
 
  router.get("/admin/calendar/comps/:year", function(req, res) {
     var year = req.params.year;
-    res.render("admin/comps/index", {year: year});
+    CalendarEvent.find({year: year}).
+            sort({start: 1}).
+            exec(function(err, comps) {
+                if(err) {
+                    req.flash("error", "Nu blev det nåt knas :-(");
+                    console.log(err);
+                    res.redirect("/");
+                }
+                else {
+                    res.render("admin/comps/index", {comps: comps, year: year});
+                }
+    });
+});
+
+router.post("/admin/calendar/comps", function(req, res) {
+    var comps = [];
+    var year = "";
+    for (var i = 0; i < req.body.legs; i++) {
+        if (i == 0) {
+            year = req.body.start1.toString().substring(0, 4);
+            comps.push(new CalendarEvent({
+                    title: req.body.title1,
+                    start: req.body.start1,
+                    link: req.body.link1,
+                    ansvarig: req.body.ansvarig1,
+                    className: "eventCompetition",
+                    lat: req.body.lat1,
+                    lng: req.body.lng1,
+                    eventorId: req.body.eventorId1,
+                    year: req.body.start1.toString().substring(0, 4),
+                    raceType: req.body.raceType1,
+                    raceDistance: req.body.raceDistance1,
+                    link: "https://eventor.orientering.se/Events/Show/" + req.body.eventorId1
+                })
+            );
+        }
+        else if (i == 1) {year = req.body.start2.toString().substring(0, 4);
+            comps.push(new CalendarEvent({
+                    title: req.body.title2,
+                    start: req.body.start2,
+                    link: req.body.link2,
+                    ansvarig: req.body.ansvarig2,
+                    className: "eventCompetition",
+                    lat: req.body.lat2,
+                    lng: req.body.lng2,
+                    eventorId: req.body.eventorId2,
+                    year: req.body.start2.toString().substring(0, 4),
+                    raceType: req.body.raceType2,
+                    raceDistance: req.body.raceDistance2,
+                    link: "https://eventor.orientering.se/Events/Show/" + req.body.eventorId2
+                })
+            );
+        }
+        else if (i == 2) {
+            year = req.body.start3.toString().substring(0, 4);
+            comps.push(new CalendarEvent({
+                    title: req.body.title3,
+                    start: req.body.start3,
+                    link: req.body.link3,
+                    ansvarig: req.body.ansvarig3,
+                    className: "eventCompetition",
+                    lat: req.body.lat3,
+                    lng: req.body.lng3,
+                    eventorId: req.body.eventorId3,
+                    year: req.body.start3.toString().substring(0, 4),
+                    raceType: req.body.raceType3,
+                    raceDistance: req.body.raceDistance3,
+                    link: "https://eventor.orientering.se/Events/Show/" + req.body.eventorId3
+                })
+            );
+        }
+        else if (i == 3) {
+            year = req.body.start4.toString().substring(0, 4);
+            comps.push(new CalendarEvent({
+                    title: req.body.title4,
+                    start: req.body.start4,
+                    link: req.body.link4,
+                    ansvarig: req.body.ansvarig4,
+                    className: "eventCompetition",
+                    lat: req.body.lat4,
+                    lng: req.body.lng4,
+                    eventorId: req.body.eventorId4,
+                    year: req.body.start4.toString().substring(0, 4),
+                    raceType: req.body.raceType4,
+                    raceDistance: req.body.raceDistance4,
+                    link: "https://eventor.orientering.se/Events/Show/" + req.body.eventorId4
+                })
+            );
+        }
+        else if (i == 4) {
+            year = req.body.start5.toString().substring(0, 4);
+            comps.push(new CalendarEvent({
+                    title: req.body.title5,
+                    start: req.body.start5,
+                    link: req.body.link5,
+                    ansvarig: req.body.ansvarig5,
+                    className: "eventCompetition",
+                    lat: req.body.lat5,
+                    lng: req.body.lng5,
+                    eventorId: req.body.eventorId5,
+                    year: req.body.start5.toString().substring(0, 4),
+                    raceType: req.body.raceType5,
+                    raceDistance: req.body.raceDistance5,
+                    link: "https://eventor.orientering.se/Events/Show/" + req.body.eventorId5
+                })
+            );
+        }
+    }
+    CalendarEvent.insertMany(comps, function(err, comps) {
+        if (err) {
+            console.log(err);
+        } else {
+            req.flash("success", "Ny tävling sparad.");
+            res.redirect("/admin/calendar/comps/" + year);
+        }
+    });
 });
 
 router.post("/admin/calendar", function(req, res) {

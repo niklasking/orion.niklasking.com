@@ -22,15 +22,15 @@ var calendarEventSchema = new mongoose.Schema({
 module.exports = mongoose.model("CalendarEvent", calendarEventSchema);
 
 // raceType:
-//  RelaySingleDay
-//  IndSingleDay
-//  IndMultiDay
+//  RelaySingleDay - Stafett (natt)
+//  IndSingleDay - Individuellt (natt)
+//  IndMultiDay - Flerdagars (natt)
 //
 // raceDistance:
-//  Long
-//  Middle
-//  UltraLong
-//  Sprint
+//  Long - Lång
+//  Middle - Medel
+//  UltraLong - Ultralång
+//  Sprint - Sprint
 //
 // className:
 //  eventTraining
