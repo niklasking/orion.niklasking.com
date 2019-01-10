@@ -31,3 +31,7 @@
 
 #mapid { height: 250px; }
 #mapid-modal { height: 200px; }
+
+.hide {
+    display: none;
+}

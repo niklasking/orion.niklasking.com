@@ -232,6 +232,7 @@ router.get("/admin/calendar", function(req, res) {
     var lat = req.query.lat;
     var lng = req.query.lng;
     var eventorId = req.query.eventorId;
+    var orgId = req.query.orgId;
     CalendarEvent.find({}, function(err, events) {
         if(err) {
             req.flash("error", "Nu blev det nåt knas :-(");
@@ -239,7 +240,7 @@ router.get("/admin/calendar", function(req, res) {
             res.redirect("/");
         }
         else {
-            res.render("admin/calendar/new", {event_list: events, date: date, _id: _id, title: title, className: className, lat: lat, lng: lng, ansvarig: ansvarig, link: link, description: description, eventorId: eventorId});
+            res.render("admin/calendar/new", {event_list: events, date: date, _id: _id, title: title, className: className, lat: lat, lng: lng, ansvarig: ansvarig, link: link, description: description, eventorId: eventorId, orgId: orgId});
         }
     });    
 });
@@ -258,26 +259,24 @@ router.get("/admin/calendar/comps/fetch", function (req, res){
             parseXMLString(body, function(err, result) {
                 if (err) {
                     res.send({events: events});
-                    // res.send({eventorId: "", title: "", start: "", ansvarig: "", lat: "", lng: "", raceType: "", raceDistance: "", raceNight: ""});
                 } else if (result.Event == undefined) {
                     res.send({events: events});
-                    // res.send({eventorId: "", title: "", start: "", ansvarig: "", lat: "", lng: "", raceType: "", raceDistance: "", raceNight: ""});
                 } else if (result.Event.StartDate == undefined) {
                     res.send({events: events});
-                    // res.send({eventorId: "", title: "", start: "", ansvarig: "", lat: "", lng: "", raceType: "", raceDistance: "", raceNight: ""});
                 } else {
                     for (var i = 0; i < result.Event.EventRace.length; i++) {
                         var eventorId = result.Event.EventId;
-                        var title = result.Event.Name + " " + result.Event.EventRace[i].Name;
-                        var ansvarig = result.Event.Organiser[0].Organisation[0].Name;
-                        var raceType = result.Event.$.eventForm;
+                        var title =     result.Event.Name + " " + result.Event.EventRace[i].Name;
+                        var ansvarig =  result.Event.Organiser[0].Organisation[0].Name;
+                        var orgId =     result.Event.Organiser[0].Organisation[0].OrganisationId;
+                        var raceType =  result.Event.$.eventForm;
 
-                        var start = result.Event.EventRace[i].RaceDate[0].Date + " " + result.Event.EventRace[i].RaceDate[0].Clock;
-                        var lat = result.Event.EventRace[i].EventCenterPosition[0].$.y;
-                        var lng = result.Event.EventRace[i].EventCenterPosition[0].$.x;
+                        var start =        result.Event.EventRace[i].RaceDate[0].Date + " " + result.Event.EventRace[i].RaceDate[0].Clock;
+                        var lat =          result.Event.EventRace[i].EventCenterPosition[0].$.y;
+                        var lng =          result.Event.EventRace[i].EventCenterPosition[0].$.x;
                         var raceDistance = result.Event.EventRace[i].$.raceDistance;
-                        var raceNight = result.Event.EventRace[i].$.raceLightCondition;
-                        var night = raceNight == "Night" ? true : false;
+                        var raceNight =    result.Event.EventRace[i].$.raceLightCondition;
+                        var night =        raceNight == "Night" ? true : false;
                         
                         events.push(new CalendarEvent({
                             title: title,
@@ -288,6 +287,7 @@ router.get("/admin/calendar/comps/fetch", function (req, res){
                             lat: lat,
                             lng: lng,
                             eventorId: eventorId,
+                            orgId: orgId,
                             year: start.toString().substring(0, 4),
                             raceType: raceType,
                             raceDistance: raceDistance,
@@ -295,19 +295,17 @@ router.get("/admin/calendar/comps/fetch", function (req, res){
                         }));
                     }
                     res.send({events: events});
-                    // res.send({eventorId: eventorId, title: title, start: start, ansvarig: ansvarig, lat: lat, lng: lng, raceType: raceType, raceDistance: raceDistance, raceNight: raceNight, multi: multi});
                 }
             });
         } else {
             if (error != undefined) {
                 console.log(error);
+                res.send({events: events});
             }
             if (response.statusCode != undefined) {
                 res.send({events: events});
-                // res.send({eventorId: "", title: "", start: "", ansvarig: "", lat: "", lng: "", raceType: "", raceDistance: "", raceNight: ""});
             } else {
                 res.send({events: events});
-                // res.send({eventorId: "", title: "", start: "", ansvarig: "", lat: "", lng: "", raceType: "", raceDistance: "", raceNight: ""});
             }
         }
     }); 
@@ -344,6 +342,7 @@ router.post("/admin/calendar/comps", function(req, res) {
                     lat: req.body.lat1,
                     lng: req.body.lng1,
                     eventorId: req.body.eventorId1,
+                    orgId: req.body.orgId1,
                     year: req.body.start1.toString().substring(0, 4),
                     raceType: req.body.raceType1,
                     raceDistance: req.body.raceDistance1,
@@ -361,6 +360,7 @@ router.post("/admin/calendar/comps", function(req, res) {
                     lat: req.body.lat2,
                     lng: req.body.lng2,
                     eventorId: req.body.eventorId2,
+                    orgId: req.body.orgId2,
                     year: req.body.start2.toString().substring(0, 4),
                     raceType: req.body.raceType2,
                     raceDistance: req.body.raceDistance2,
@@ -379,6 +379,7 @@ router.post("/admin/calendar/comps", function(req, res) {
                     lat: req.body.lat3,
                     lng: req.body.lng3,
                     eventorId: req.body.eventorId3,
+                    orgId: req.body.orgId3,
                     year: req.body.start3.toString().substring(0, 4),
                     raceType: req.body.raceType3,
                     raceDistance: req.body.raceDistance3,
@@ -397,6 +398,7 @@ router.post("/admin/calendar/comps", function(req, res) {
                     lat: req.body.lat4,
                     lng: req.body.lng4,
                     eventorId: req.body.eventorId4,
+                    orgId: req.body.orgId4,
                     year: req.body.start4.toString().substring(0, 4),
                     raceType: req.body.raceType4,
                     raceDistance: req.body.raceDistance4,
@@ -415,6 +417,7 @@ router.post("/admin/calendar/comps", function(req, res) {
                     lat: req.body.lat5,
                     lng: req.body.lng5,
                     eventorId: req.body.eventorId5,
+                    orgId: req.body.orgId5,
                     year: req.body.start5.toString().substring(0, 4),
                     raceType: req.body.raceType5,
                     raceDistance: req.body.raceDistance5,

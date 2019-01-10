@@ -16,7 +16,8 @@ var calendarEventSchema = new mongoose.Schema({
     year: String,
     raceType: String,
     raceDistance: String,
-    raceNight: Boolean
+    raceNight: Boolean,
+    orgId: String
 });
 
 module.exports = mongoose.model("CalendarEvent", calendarEventSchema);

@@ -143,8 +143,7 @@
         </div>
         <div class="col-md-4">
             <h1>Tävling</h1>
-            <h3>Blekingetävlingar</h3>
-            <table class="table table-sm table-striped">
+            <table class="table table-sm table-striped" id="compsTable">
                 <thead>
                     <tr>
                         <td scope="col">Datum</td>
@@ -155,63 +154,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>1/11</td>
-                        <td><a href="https://eventor.orientering.se/Events/Show/23804">Östra Blekinges Nattcup 1</a></td>
-                        <td><img src="/static/imgs/288.png" alt="">OK Orion</td>
-                        <td>N</td>
-                        <td>34</td>
-                    </tr>
-                    <tr>
-                        <td>8/11</td>
-                        <td><a href="https://eventor.orientering.se/Events/Show/24036">Östra Blekinges Nattcup 2</a></td>
-                        <td><img src="/static/imgs/288.png" alt="">OK Orion<br><img src="/static/imgs/2698.png">Karlskrona SOK</td>
-                        <td>N</td>
-                        <td>31</td>
-                    </tr>
-                    <tr>
-                        <td>15/11</td>
-                        <td><a href="https://eventor.orientering.se/Events/Show/24037">Östra Blekinges Nattcup 3</a></td>
-                        <td><img src="/static/imgs/288.png" alt="">OK Orion</td>
-                        <td>N</td>
-                        <td>30</td>
-                    </tr>
-                    <tr>
-                        <td>22/11</td>
-                        <td><a href="https://eventor.orientering.se/Events/Show/24038">Östra Blekinges Nattcup 4</a></td>
-                        <td><img src="/static/imgs/288.png" alt="">OK Orion<br><img src="/static/imgs/310.png">Ronneby OK</td>
-                        <td>N</td>
-                        <td>26</td>
-                    </tr>
-                    <tr>
-                        <td>25/11</td>
-                        <td><a href="">Skinkskubbet</a></td>
-                        <td><img src="/static/imgs/339.png" alt="">OK Skogsfalken</td>
-                        <td>L</td>
-                        <td>1</td>
-                    </tr>
-                    <tr>
-                        <td>29/11</td>
-                        <td><a href="https://eventor.orientering.se/Events/Show/24039">Östra Blekinges Nattcup 5</a></td>
-                        <td><img src="/static/imgs/288.png" alt="">OK Orion</td>
-                        <td>N</td>
-                        <td>31</td>
-                    </tr>
-                    <tr>
-                        <td>29/11</td>
-                        <td><a href="https://eventor.orientering.se/Events/Show/24132">Pölder Sport Nattcup Etapp 1</a></td>
-                        <td><img src="/static/imgs/551.png" alt="">OK Vilse 87</td>
-                        <td>N</td>
-                        <td>-</td>
-                    </tr>
-                    <tr>
-                        <td>6/12</td>
-                        <td><a href="https://eventor.orientering.se/Events/Show/24040">Östra Blekinges Nattcup 6</a></td>
-                        <td><img src="/static/imgs/288.png" alt="">OK Orion<br><img src="/static/imgs/2698.png">Karlskrona SOK</td>
-                        <td>N</td>
-                        <td>1</td>
-                    </tr>
-                </tbody>
+               </tbody>
             </table>
         </div>
     </div>
@@ -272,5 +215,27 @@
         mymap.invalidateSize(true);
     })
 </script>
+<script>
+    $.ajax({
+        url: "/calendar/comp/fetch",
+        data: { year: "2019" }, 
+        success: function(data){
+            data.rows.forEach(function(row) {
+                $("#compsTable tbody").append(row);
+            });
+        },
+        error: function(jqXHR, textStatus, err){
+            console.log('text status '+textStatus+', err '+err);
+        }
+    });
+</script>
+
+<!-- <tr>
+    <td>1/11</td>
+    <td><a href="https://eventor.orientering.se/Events/Show/23804">Östra Blekinges Nattcup 1</a></td>
+    <td><img src="/static/imgs/288.png" alt="">OK Orion</td>
+    <td>N</td>
+    <td>34</td>
+</tr> -->
 
 <% include partials/footer %>

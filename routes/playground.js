@@ -86,6 +86,37 @@ router.get("/comps/test/:id", function(req, res) {
     });
 });
 
+router.get("/entries/test/:id", function(req, res) {
+    var id = req.params.id;
+    // Nattcup 9: 24584
+    var options = {
+        url: 'https://eventor.orientering.se/api/competitorcount?organisationIds=288&eventIds=' + id,
+        headers: {
+        'ApiKey': API_KEY
+        }
+    };
+    request(options, function(error, response, body) {
+        if (!error && response.statusCode == 200) {
+            parseXMLString(body, function(err, result) {
+                if (err) {
+                    console.log(err);
+                    res.redirect("/");
+                } else {
+                    res.send(result);
+                }
+            });
+        } else {
+            if (error != undefined) {
+                console.log(error);
+            }
+            if (response.statusCode != undefined) {
+                console.log(response.statusCode);
+            }
+            res.redirect("/");
+        }
+    });
+});
+
 
 router.get("/test/landing1", function(req, res) {
     res.render("test/landing1");

@@ -7,11 +7,6 @@
 
 <script>
     $(function() {
-        // var inputDate = <%= date %>;
-        // var showDate = moment(Date.now());
-        // if (inputDate != undefined) {
-        //     showDate = calEvent.start;
-        // }
         $('#calendar').fullCalendar({
             locale: 'sv',
             firstDay: 1,
@@ -24,21 +19,64 @@
                 center: 'title',
                 right: 'today,prev,next'
             },
-            // gotoDate: showDate,
             events: <%- JSON.stringify(event_list) %>,
             eventClick: function(calEvent, jsEvent, view) {
-                location.replace("/kalender?title=" + encodeURIComponent(calEvent.title) + 
-                    "&date=" + moment(calEvent.start).format("YYYY-MM-DD HH:mm") +
-                    "&className=" + calEvent.className +
-                    "&lat=" + calEvent.lat +
-                    "&lng=" + calEvent.lng +
-                    "&link=" + calEvent.link +
-                    "&ansvarig=" + encodeURIComponent(calEvent.ansvarig) +
-                    "&description=" + encodeURIComponent(calEvent.description) + 
-                    "&eventorId=" + calEvent.eventorId +
-                    "&raceType=" + calEvent.raceType +
-                    "&raceDistance=" + calEvent.raceDistance +
-                    "&_id=" + calEvent._id);
+                $.ajax({
+                    url: "/calendar/fetch",
+                    data: { eventId: calEvent._id }, 
+                    success: function(data){
+                        if (data.event != undefined) {
+                            $('.hide').removeClass('hide');
+                            $('#title').text(data.event.title);
+                            $('#date').text(data.event.start);
+                            if (data.event.description == undefined || data.event.description == "") {
+                                $('#descriptionRow').hide();
+                            } else {
+                                $('#descriptionRow').show();
+                                $('#description').text(data.event.description);
+                            }
+                            if (data.event.ansvarig == undefined || data.event.ansvarig == "") {
+                                $('#ansvarigRow').hide();
+                            } else {
+                                $('#ansvarigRow').show();
+                                $('#ansvarig').text(data.event.ansvarig);
+                                if (data.event.eventorId == undefined || data.event.eventorId == "") {
+                                    $('#ansvarigTitle').text("Ansvarig:");
+                                } else {
+                                    $('#ansvarigTitle').text("Arrangör:");
+                                }
+                            }
+                            if (data.event.raceType == undefined || data.event.raceType == "") {
+                                $('#raceTypeRow').hide();
+                            } else {
+                                $('#raceTypeRow').show();
+                                $('#raceType').text(data.event.raceType);
+                            }
+                            if (data.event.raceDistance == undefined || data.event.raceDistance == "") {
+                                $('#raceDistanceRow').hide();
+                            } else {
+                                $('#raceDistanceRow').show();
+                                $('#raceDistance').text(data.event.raceDistance);
+                            }
+                            if (data.event.link == undefined || data.event.link == "") {
+                                $('#linkRow').hide();
+                            } else {
+                                $('#linkRow').show();
+                                $('#link').text(data.event.link);
+                                $('#link').attr("href", data.event.link);
+                            }
+                            if (data.event.lat == undefined || data.event.lat == "" || data.event.lng == undefined || data.event.lat == "") {
+                                $('#mapid').hide();
+                            } else {
+                                $('#mapid').show();
+                                renderMap(data.event);
+                            }
+                        }
+                    },
+                    error: function(jqXHR, textStatus, err){
+                        console.log('text status '+textStatus+', err '+err);
+                    }
+                });
             },
             eventRender: function(event, eventElement) {
                 if (event.className == "eventTraining") {
@@ -57,11 +95,10 @@
         });
     });
 </script>
-<div class="container">
-    <% if (_id != undefined) { %>
+<div class="container hide">
         <div class="row">
             <div class="col">
-                <h1><%= title %></h1>
+                <h1 id="title"></h1>
             </div>
         </div>
         <div class="row">
@@ -69,64 +106,49 @@
                 <strong>Tid och datum:</strong>
             </div>
             <div class="col-10">
-                <%= date %>
+                <span id="date"></span>
             </div>
         </div>
-        <% if (description != undefined && description.length > 0 && description != "undefined") { %>
-            <div class="row">
-                <div class="col my-3">
-                    <%= description %>
-                </div>
+        <div class="row" id="descriptionRow">
+            <div class="col my-3">
+                <span id="description"></span>
             </div>
-        <% } %>
-        <% if (ansvarig != undefined && ansvarig.length > 0) { %>
-            <div class="row">
-                <div class="col-2">
-                    <% if (eventorId != undefined) { %>
-                        <strong>Arrangör:</strong>
-                    <% } else { %>
-                        <strong>Ansvarig:</strong>
-                    <% } %>
-                </div>
-                <div class="col-10">
-                    <%= ansvarig %>
-                </div>
+        </div>
+        <div class="row" id="ansvarigRow">
+            <div class="col-2">
+                <strong><span id="ansvarigTitle"></span></strong>
             </div>
-        <% } %>
-        <% if (raceType != undefined && raceType != "undefined") { %>
-            <div class="row">
-                <div class="col-2">
-                    <strong>Typ:</strong>
-                </div>
-                <div class="col-10">
-                    <%= raceType %>
-                </div>
+            <div class="col-10">
+                <span id="ansvarig"></span>
             </div>
-        <% } %>
-        <% if (raceDistance != undefined && raceDistance != "undefined") { %>
-            <div class="row">
-                <div class="col-2">
-                    <strong>Distans:</strong>
-                </div>
-                <div class="col-10">
-                    <%= raceDistance %>
-                </div>
+        </div>
+        <div class="row" id="raceTypeRow">
+            <div class="col-2">
+                <strong>Typ:</strong>
             </div>
-        <% } %>
-        <% if (link != undefined && link.length > 0) { %>
-            <div class="row">
-                <div class="col-2">
-                    <strong>Mer info:</strong>
-                </div>
-                <div class="col-10">
-                    <a href="<%= link %>"><%= link %></a>
-                </div>
+            <div class="col-10">
+                <span id="raceType"></span>
             </div>
-        <% } %>
-    <% } %>
-    <% if (lat != undefined && lat != "" && lng != undefined && lng != "") { %>
+        </div>
+        <div class="row" id="raceDistanceRow">
+            <div class="col-2">
+                <strong>Distans:</strong>
+            </div>
+            <div class="col-10">
+                <span id="raceDistance"></span>
+            </div>
+        </div>
+        <div class="row" id="linkRow">
+            <div class="col-2">
+                <strong>Mer info:</strong>
+            </div>
+            <div class="col-10">
+                <a id="link" href=""></a>
+            </div>
+        </div>
         <div id="mapid"></div>
-    <% } %>
+</div>
+<div class="container">
     <hr>
     <div class="row">
         <div class="col mb-5">
@@ -137,26 +159,33 @@
 </div>
 
 <script>
-    // const urlParams = new URLSearchParams(window.location.search);
-    // const lat = urlParams.get('lat');
-    // const lng = urlParams.get('lng');
-    var lat = '<%= lat %>';
-    var lng = '<%= lng %>';
+    var mymap;
+    var marker;
+</script>
+<script>
+    function renderMap(event) {
+        var lat = event.lat;
+        var lng = event.lng;
+        if (mymap == undefined) {
+            mymap = L.map('mapid').setView([lat, lng], 11);
+            L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+                maxZoom: 18,
+                attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+                    '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                    'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                id: 'mapbox.streets'
+            }).addTo(mymap);
+        } else {
+            mymap.setView([lat, lng], 11);
+        }
 
-    if (lat != "" && lng != "") {
-        var mymap = L.map('mapid').setView([lat, lng], 11);
-
-        L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
-            maxZoom: 18,
-            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
-                '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-                'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-            id: 'mapbox.streets'
-        }).addTo(mymap);
-
-        var marker;
-        marker = new L.Marker([lat, lng]);
-        marker.addTo(mymap);
+        if (lat != undefined && lng != undefined) {
+            if (marker != undefined) { // check
+                mymap.removeLayer(marker); // remove
+            }
+            marker = new L.Marker([lat, lng]);
+            marker.addTo(mymap);
+        }
     }
 </script>
 <% include ../partials/footer %>

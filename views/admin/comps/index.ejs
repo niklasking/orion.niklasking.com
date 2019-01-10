@@ -17,13 +17,13 @@
             <div class="col align-self-center">
                 <span><%= comps[i].title %></span>
             </div>
-            <div class="btn btn-primary">Ta bort</div>
+            <div class="btn btn-danger btn-sm">Ta bort</div>
         </div>
     <% } %>
     <div class="row">
         <div class="col">
             <hr>
-            <h1>Lägg till en tävling till tävlingspgrogrammet <%= year %></h1>
+            <h1>Lägg till en tävling till tävlingsprogrammet <%= year %></h1>
         </div>
     </div>
 
@@ -273,6 +273,7 @@
             <input type="hidden" name="legs" id="legs">
 
             <input type="hidden" name="eventorId1" id="eventorIdInput1">
+            <input type="hidden" name="orgId1" id="orgIdInput1">
             <input type="hidden" name="start1" id="startInput1">
             <input type="hidden" name="title1" id="titleInput1">
             <input type="hidden" name="ansvarig1" id="ansvarigInput1">
@@ -282,6 +283,7 @@
             <input type="hidden" name="raceDistance1" id="raceDistanceInput1">
 
             <input type="hidden" name="eventorId2" id="eventorIdInput2">
+            <input type="hidden" name="orgId2" id="orgIdInput2">
             <input type="hidden" name="start2" id="startInput2">
             <input type="hidden" name="title2" id="titleInput2">
             <input type="hidden" name="ansvarig2" id="ansvarigInput2">
@@ -291,6 +293,7 @@
             <input type="hidden" name="raceDistance2" id="raceDistanceInput2">
 
             <input type="hidden" name="eventorId3" id="eventorIdInput3">
+            <input type="hidden" name="orgId3" id="orgIdInput3">
             <input type="hidden" name="start3" id="startInput3">
             <input type="hidden" name="title3" id="titleInput3">
             <input type="hidden" name="ansvarig3" id="ansvarigInput3">
@@ -300,6 +303,7 @@
             <input type="hidden" name="raceDistance3" id="raceDistanceInput3">
 
             <input type="hidden" name="eventorId4" id="eventorIdInput4">
+            <input type="hidden" name="orgId4" id="orgIdInput4">
             <input type="hidden" name="start4" id="startInput4">
             <input type="hidden" name="title4" id="titleInput4">
             <input type="hidden" name="ansvarig4" id="ansvarigInput4">
@@ -309,6 +313,7 @@
             <input type="hidden" name="raceDistance4" id="raceDistanceInput4">
 
             <input type="hidden" name="eventorId5" id="eventorIdInput5">
+            <input type="hidden" name="orgId5" id="orgIdInput5">
             <input type="hidden" name="start5" id="startInput5">
             <input type="hidden" name="title5" id="titleInput5">
             <input type="hidden" name="ansvarig5" id="ansvarigInput5">
@@ -403,6 +408,7 @@
 
                             $('#legs').val("1");
                             $('#eventorIdInput1').val(data.events[0].eventorId);
+                            $('#orgIdInput1').val(data.events[i].orgId);
                             $('#startInput1').val(data.events[0].start);
                             $('#titleInput1').val(data.events[0].title);
                             $('#ansvarigInput1').val(data.events[0].ansvarig);
@@ -437,6 +443,7 @@
 
                             $('#legs').val("2");
                             $('#eventorIdInput2').val(data.events[i].eventorId);
+                            $('#orgIdInput2').val(data.events[i].orgId);
                             $('#startInput2').val(data.events[i].start);
                             $('#titleInput2').val(data.events[i].title);
                             $('#ansvarigInput2').val(data.events[i].ansvarig);
@@ -471,6 +478,7 @@
 
                             $('#legs').val("3");
                             $('#eventorIdInput3').val(data.events[i].eventorId);
+                            $('#orgIdInput3').val(data.events[i].orgId);
                             $('#startInput3').val(data.events[i].start);
                             $('#titleInput3').val(data.events[i].title);
                             $('#ansvarigInput3').val(data.events[i].ansvarig);
@@ -505,6 +513,7 @@
 
                             $('#legs').val("4");
                             $('#eventorIdInput4').val(data.events[i].eventorId);
+                            $('#orgIdInput4').val(data.events[i].orgId);
                             $('#startInput4').val(data.events[i].start);
                             $('#titleInput4').val(data.events[i].title);
                             $('#ansvarigInput4').val(data.events[i].ansvarig);
@@ -539,6 +548,7 @@
 
                             $('#legs').val("5");
                             $('#eventorIdInput5').val(data.events[i].eventorId);
+                            $('#orgIdInput5').val(data.events[i].orgId);
                             $('#startInput5').val(data.events[i].start);
                             $('#titleInput5').val(data.events[i].title);
                             $('#ansvarigInput5').val(data.events[i].ansvarig);
