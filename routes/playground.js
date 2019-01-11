@@ -122,6 +122,10 @@ router.get("/test/landing1", function(req, res) {
     res.render("test/landing1");
 });
 
+router.get("/test/chat", function(req, res) {
+    res.render("test/chat");
+});
+
 
 function isLoggedIn(req, res, next) {
     if (req.isAuthenticated()) {

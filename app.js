@@ -28,6 +28,31 @@ app.use('/static', express.static('static'));
 app.use(flash());
 app.use(methodOverride("_method"));
 
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
+
+io.on('connection', function(socket){
+    console.log('A user is connected');
+    socket.on('disconnect', function(){
+      console.log('A user got disconnected');
+    });
+});
+io.on('connection', function(socket){
+    socket.on('chat message', function(msg){
+      console.log('message: ' + msg);
+    });
+});
+io.on('connection', function(socket){
+    socket.on('chat message', function(msg){
+      io.emit('chat message', msg);
+    });
+});
+io.on('connection', function(socket){
+    socket.on('refresh status', function(msg){
+      io.emit('refresh status', msg);
+    });
+});
+
 app.use(require("express-session")({
     secret: "Ole King cyklade runt Hagel Island on the ice with suger in his hair",
     resave: false,
@@ -140,7 +165,8 @@ app.use("/", adminRoutes);
 app.use("/", resultsRoutes);
 app.use("/", playgroundRoutes);
 
-var server = app.listen(4455, process.env.IP, function() {
+// var server = app.listen(4455, process.env.IP, function() {
+var server = http.listen(4455, process.env.IP, function() {
 // var server = app.listen(process.env.PORT, process.env.IP, function() {
     console.log("Orionpokalen is started at port: " + server.address().port);
 });

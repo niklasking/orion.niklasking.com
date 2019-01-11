@@ -36,7 +36,11 @@
                 </tr>
             <% }); %>
     </table>
-    <a href="/<%= compType %>" class="btn btn-primary mt-3">Tillbaka</a>
+    <% if (compType == "orionpokalen") { %>
+        <a href="/orionpokalen/<%= year %>" class="btn btn-primary mt-3">Tillbaka</a>
+    <% } else { %>
+        <a href="/orion1000/<%= year %>" class="btn btn-primary mt-3">Tillbaka</a>
+    <% } %>
 </div>
 
 <% include ../partials/footer %>

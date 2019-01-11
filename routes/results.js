@@ -50,7 +50,7 @@ router.get("/orion1000/:id/:year", function(req, res) {
         if (err) {
             console.log(err);
         } else {
-            res.render("orion1000/results", {runner: runners[0], compType: req.query.compType});
+            res.render("orion1000/results", {runner: runners[0], compType: req.query.compType, year: year});
         }
     });
 });

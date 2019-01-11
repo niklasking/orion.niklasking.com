@@ -1,0 +1,31 @@
+
+<% include ../partials/header %>
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h1>Hämta Resultat från Eventor</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <input class="btn btn-danger" id="refresh2019" value="Hämta för 2019">
+        </div>
+    </div>
+</div>
+<ul id="messages"></ul>
+<script src="/static/js/socket.io.js"></script>
+<script>
+    $(function () {
+        var socket = io();
+        socket.on('refresh status', function(msg){
+            $('#messages').append($('<li>').text(msg));
+        });
+    });
+</script>
+<script type="text/javascript">            
+    $('#refresh2019').click(function(){  
+        
+    });
+</script>
+<% include ../partials/footer %>

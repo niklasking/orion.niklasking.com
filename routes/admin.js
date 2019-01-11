@@ -245,6 +245,9 @@ router.get("/admin/calendar", function(req, res) {
     });    
 });
 
+router.get("/admin", function(req, res) {
+    res.render("admin/index");
+});
 router.get("/admin/calendar/comps/fetch", function (req, res){  
     var id = req.query.eventorId;
     var options = {
@@ -534,6 +537,7 @@ router.post("/admin/calendar", function(req, res) {
             if(err) {
                 req.flash("error", "Nu blev det nåt knas :-(");
                 console.log(err);
+                res.redirect("/admin/calendar");
             }
             else {
                 // req.flash("success", "Successfully created a campground.");
@@ -796,7 +800,8 @@ function getAndSaveCompetitions(runner, body, year) {
                 if (err) {
                     console.log(err);
                 } else {
-                    Runner.update({eventorId: runnerId},{competitions: comps},{upsert:true},function(err){
+                    // Runner.update({eventorId: runnerId},{competitions: comps},{upsert:true},function(err){
+                    Runner.findByIdAndUpdate(runner._id, {competitions: comps}, function(err, updatedRunner) {
                         if(err){
                             console.log(err);
                         }
