@@ -37,7 +37,7 @@
             },
             events: <%- JSON.stringify(event_list) %>,
             eventClick: function(calEvent, jsEvent, view) {
-                location.replace("/admin/calendar?title=" + calEvent.title + 
+                location.replace("/admin/calendar?title=" + encodeURIComponent(calEvent.title) + 
                     "&date=" + moment(calEvent.start).format("YYYY-MM-DD HH:mm") +
                     "&className=" + calEvent.className +
                     "&lat=" + calEvent.lat +
@@ -65,7 +65,7 @@
                 <div class="form-group">
                     <label for="title">Titel</label>
                     <% if (title != undefined) { %>
-                        <input class="form-control" id="title" type="text" value="<%= title %>" name="title" required>
+                        <input class="form-control" id="title" type="text" value="<%= decodeURIComponent(title) %>" name="title" required>
                     <% } else { %>
                         <input class="form-control" id="title" type="text" placeholder="Titel" name="title" required>
                     <% } %>

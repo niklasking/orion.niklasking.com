@@ -26,20 +26,25 @@
                     data: { eventId: calEvent._id }, 
                     success: function(data){
                         if (data.event != undefined) {
+                            $('#form-_id').val(data.event._id);
                             $('.hide').removeClass('hide');
                             $('#title').text(data.event.title);
+                            $('#form-title').val(data.event.title);
                             $('#date').text(data.event.start);
+                            $('#form-date').val(data.event.start);
                             if (data.event.description == undefined || data.event.description == "") {
                                 $('#descriptionRow').hide();
                             } else {
                                 $('#descriptionRow').show();
                                 $('#description').text(data.event.description);
+                                $('#form-description').val(data.event.description);
                             }
                             if (data.event.ansvarig == undefined || data.event.ansvarig == "") {
                                 $('#ansvarigRow').hide();
                             } else {
                                 $('#ansvarigRow').show();
                                 $('#ansvarig').text(data.event.ansvarig);
+                                $('#form-ansvarig').val(data.event.ansvarig);
                                 if (data.event.eventorId == undefined || data.event.eventorId == "") {
                                     $('#ansvarigTitle').text("Ansvarig:");
                                 } else {
@@ -51,23 +56,28 @@
                             } else {
                                 $('#raceTypeRow').show();
                                 $('#raceType').text(data.event.raceType);
+                                $('#form-raceType').val(data.event.raceType);
                             }
                             if (data.event.raceDistance == undefined || data.event.raceDistance == "") {
                                 $('#raceDistanceRow').hide();
                             } else {
                                 $('#raceDistanceRow').show();
                                 $('#raceDistance').text(data.event.raceDistance);
+                                $('#form-raceDistance').val(data.event.raceDistance);
                             }
                             if (data.event.link == undefined || data.event.link == "") {
                                 $('#linkRow').hide();
                             } else {
                                 $('#linkRow').show();
                                 $('#link').text(data.event.link);
+                                $('#form-link').val(data.event.link);
                                 $('#link').attr("href", data.event.link);
                             }
                             if (data.event.lat == undefined || data.event.lat == "" || data.event.lng == undefined || data.event.lat == "") {
                                 $('#mapid').hide();
                             } else {
+                                $('#form-lat').val(data.event.lat);
+                                $('#form-lng').val(data.event.lng);
                                 $('#mapid').show();
                                 renderMap(data.event);
                             }
@@ -146,7 +156,37 @@
                 <a id="link" href=""></a>
             </div>
         </div>
-        <div id="mapid"></div>
+        <div class="row">
+            <div class="col">
+                <div id="mapid"></div>        
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <form action="/admin/calendar" method="GET">
+                    <input type="hidden" name="date" id="form-date">
+                    <input type="hidden" name="className" id="form-className">
+                    <input type="hidden" name="title" id="form-title">
+                    <input type="hidden" name="ansvarig" id="form-ansvarig">
+                    <input type="hidden" name="link" id="form-link">
+                    <input type="hidden" name="description" id="form-description">
+                    <input type="hidden" name="lat" id="form-lat">
+                    <input type="hidden" name="lng" id="form-lng">
+                    <input type="hidden" name="raceType" id="form-raceType">
+                    <input type="hidden" name="raceDistance" id="form-raceDistance">
+
+                    <input type="hidden" name="_id" id="form-_id">
+
+                    <!-- <input type="hidden" name="eventorId" id="form-eventorId">
+                    <input type="hidden" name="orgId" id="form-orgId">
+                    <input type="hidden" name="year" id="form-year"> -->
+
+                    <button id="changeButton" type="submit" class="btn btn-secondary mt-2">Ändra/Ta bort</button>
+                </form>
+            </div>
+        </div>
+
+    
 </div>
 <div class="container">
     <hr>

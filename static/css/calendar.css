@@ -35,3 +35,6 @@
 .hide {
     display: none;
 }
+.fc-list-item:hover {
+    cursor: pointer;
+}

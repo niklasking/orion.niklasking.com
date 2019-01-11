@@ -2,6 +2,7 @@ var express         = require('express'),
     request         = require('request'),
     bodyParser      = require('body-parser'),
     parseXMLString  = require('xml2js').parseString,
+    methodOverride  = require('method-override');
     flash           = require('connect-flash'),
     mongoose        = require('mongoose'),
     passport        = require('passport'),
@@ -25,6 +26,7 @@ app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
 app.use('/static', express.static('static'));
 app.use(flash());
+app.use(methodOverride("_method"));
 
 app.use(require("express-session")({
     secret: "Ole King cyklade runt Hagel Island on the ice with suger in his hair",

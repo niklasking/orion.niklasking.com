@@ -5,8 +5,8 @@ var calendarEventSchema = new mongoose.Schema({
     start: String,
     url: String,
     link: String,
-    place: String,
-    responsible: String,
+    // place: String,
+    // responsible: String,
     description: String,
     ansvarig: String,
     className: String,
@@ -16,7 +16,7 @@ var calendarEventSchema = new mongoose.Schema({
     year: String,
     raceType: String,
     raceDistance: String,
-    raceNight: Boolean,
+    // raceNight: Boolean,
     orgId: String
 });
 

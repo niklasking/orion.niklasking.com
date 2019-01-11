@@ -11,13 +11,18 @@
             locale: 'sv',
             firstDay: 1,
             height: "auto",
-            defaultView: 'listWeek',
+            // defaultView: 'listWeek',
+            // defaultView: 'listMonth',
             timezone: 'local',
+            defaultView: 'list', // the name of a generic view
+            duration: { days: 7 },
             header: {
                 left: false,
-                center: false,
-                right: false
+                center: false
+                // right: false
             },
+            listDayFormat: "dddd [ - ] LL",
+            noEventsMessage: "Inga aktiviteter planerade",
             events: <%- JSON.stringify(event_list) %>,
             eventClick: function(calEvent, jsEvent, view) {
                 // location.replace("/calendar:" + calEvent._id);
@@ -55,7 +60,25 @@
                 } else {
                     $('#mapid-modal').attr('style', 'visibility: hidden;');
                 }
-
+                var str = "/admin/calendar?title=";
+                str += encodeURIComponent(calEvent.title);
+                str += "&date=";
+                str += moment(calEvent.start).format("YYYY-MM-DD HH:mm");
+                str += "&className=";
+                str += calEvent.className;
+                str += "&lat=";
+                str += calEvent.lat;
+                str += "&lng=";
+                str += calEvent.lng;
+                str += "&link=";
+                str += calEvent.link;
+                str += "&ansvarig=";
+                str += calEvent.ansvarig;
+                str += "&description=";
+                str += calEvent.description;
+                str += "&_id=";
+                str += calEvent._id;
+                $('#modelEditUrl').html(str);
                 $('#calendarModal').modal('show');
             }
         });
@@ -200,7 +223,10 @@
             <hr>
             <div id="mapid-modal"></div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                    <span style="display: none;" id="modelEditUrl"></span>
+                    <!-- <span id="modelEditUrl"></span> -->
+                    <button type="button" id="changeButton" class="btn btn-secondary" data-dismiss="modal">Ändra/Ta bort</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -229,13 +255,10 @@
         }
     });
 </script>
-
-<!-- <tr>
-    <td>1/11</td>
-    <td><a href="https://eventor.orientering.se/Events/Show/23804">Östra Blekinges Nattcup 1</a></td>
-    <td><img src="/static/imgs/288.png" alt="">OK Orion</td>
-    <td>N</td>
-    <td>34</td>
-</tr> -->
-
+<script>
+    $('#changeButton').click(function(){  
+        var url = $('#modelEditUrl').text();
+        window.location.replace(encodeURI(url));
+    });
+</script>
 <% include partials/footer %>

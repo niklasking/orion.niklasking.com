@@ -127,7 +127,6 @@ function getOrionEntries(events) {
         ids += "," + events[i].eventorId;
     };
     var options = {
-        // url: 'https://eventor.orientering.se/api/competitorcount?organisationIds=483&eventIds=' + ids,
         url: 'https://eventor.orientering.se/api/competitorcount?organisationIds=288&eventIds=' + ids,
         headers: {
         'ApiKey': API_KEY
