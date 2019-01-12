@@ -25,15 +25,22 @@ router.get("/admin/runners/refresh/:year", isLoggedIn, function(req, res) {
     };
     var data; // Used to transfer info between promises.
 
+    var app = req.app;
+    req.app.io.sockets.emit('refresh status', "Nu börjar vi!");
+    
+    
+
     // Get members from Eventor
     var dataPromise = new Promise(function(resolve, reject) {
         request(options, function(error, response, body) {
             if (error || response.statusCode != 200) {
                 req.flash("error", "Nu blev det knas i steg 1 :-(");
                 console.log("error 1");
+                req.app.io.sockets.emit('refresh status', "ERROR: Nu blev det knas i steg 1.");
                 reject(error);
             } else {
                 console.log("ok 1");
+                req.app.io.sockets.emit('refresh status', "Alla medlemmar hämtade från Eventor för " + year);
                 data = body;
                 resolve(data);
             }
@@ -48,6 +55,7 @@ router.get("/admin/runners/refresh/:year", isLoggedIn, function(req, res) {
                     reject(err);
                 } else {
                     console.log("ok 2");
+                    req.app.io.sockets.emit('refresh status', "Alla medlemmar borttagna från databasen för " + year);
                     resolve();
                 }
             });    
@@ -62,6 +70,7 @@ router.get("/admin/runners/refresh/:year", isLoggedIn, function(req, res) {
                     reject(err);
                 } else {
                     console.log("ok 3");
+                    req.app.io.sockets.emit('refresh status', "Alla resultat borttagna från databasen för " + year);
                     resolve();
                 }
             });
@@ -76,6 +85,7 @@ router.get("/admin/runners/refresh/:year", isLoggedIn, function(req, res) {
                     reject(err);
                 } else {
                     console.log("ok 4");
+                    req.app.io.sockets.emit('refresh status', "Svaret från Eventor verkar vara ok.");
                     resolve(result);
                 }
             });
@@ -115,8 +125,8 @@ router.get("/admin/runners/refresh/:year", isLoggedIn, function(req, res) {
                             reject(err);
                         } else {
                             console.log("ok 6");
+                            req.app.io.sockets.emit('refresh status', "Hämtade alla medlemmar från databasen för att kunna spara resultaten.");
                             data = runners;
-                            // console.log(runners.length);
                             resolve(runners);
                         }
                     });
@@ -125,11 +135,12 @@ router.get("/admin/runners/refresh/:year", isLoggedIn, function(req, res) {
                     var promises = [];
                     runners = data;
                     runners.forEach(function(runner) {
-                        promises.push(getCompsForRunner(runner, year));
+                        promises.push(getCompsForRunner(runner, year, req.app.io));
                     });
                     Promise.all(promises) 
                     .then((results) => {
                         console.log("ok 7");
+                        req.app.io.sockets.emit('refresh status', "Hämtade alla resultat för " + year);
                         // Get runners and competitions and start calculating points
                         dataPromise = new Promise(function(resolve, reject) {
                             var query = Runner.
@@ -142,6 +153,7 @@ router.get("/admin/runners/refresh/:year", isLoggedIn, function(req, res) {
                                     reject(err);
                                 } else {
                                     console.log("ok 8");
+                                    req.app.io.sockets.emit('refresh status', "Dax att börja beräkna poängen.");
                                     data = runners;
                                     resolve(runners);
                                 }            
@@ -151,11 +163,13 @@ router.get("/admin/runners/refresh/:year", isLoggedIn, function(req, res) {
                             var promises = [];
                             runners = data;
                             runners.forEach(function(runner) {
-                                promises.push(calculatePoints(runner));
+                                promises.push(calculatePoints(runner, req.app.io));
+                                // promises.push(calculatePoints(runner));
                             });
                             Promise.all(promises) 
                                 .then((results) => {
                                     console.log("ok 9");
+                                    req.app.io.sockets.emit('refresh status', "Alla poäng beräknade för " + year);
                                     // Get runners and competitions and start calculating cups
                                     dataPromise = new Promise(function(resolve, reject) {
                                         var query = Runner.
@@ -168,6 +182,7 @@ router.get("/admin/runners/refresh/:year", isLoggedIn, function(req, res) {
                                                 reject(err);
                                             } else {
                                                 console.log("ok 10");
+                                                req.app.io.sockets.emit('refresh status', "Dax att börja räkna poäng för Spring till 1000 samt Orionpokalen för " + year);
                                                 data = runners;
                                                 resolve(runners);
                                             }            
@@ -177,13 +192,12 @@ router.get("/admin/runners/refresh/:year", isLoggedIn, function(req, res) {
                                         var promises = [];
                                         runners = data;
                                         runners.forEach(function(runner) {
-                                            promises.push(calculateCupPoints(runner));
+                                            promises.push(calculateCupPoints(runner, req.app.io));
                                         });
                                         Promise.all(promises) 
                                             .then((results) => {
                                                 console.log("ok 11");
-                                                //******************* */
-                                                req.flash("success", "Alla resultat hämtade och beräknade.");
+                                                req.app.io.sockets.emit('refresh status', "Alla resultat hämtade och beräknade för" + year);
                                                 res.redirect("/");
                                             })
                                             .catch((e) => {
@@ -195,6 +209,7 @@ router.get("/admin/runners/refresh/:year", isLoggedIn, function(req, res) {
                                 })
                                 .catch((e) => {
                                     req.flash("error", "Nu blev det knas i steg 9 :-(");
+                                    req.app.io.sockets.emit('refresh status', "ERROR 9: Kunde inte beräkna poängen för Spring till 1000 och Oriopokalen.");
                                     console.log("error 9");
                                     res.redirect("/");
                                 });
@@ -248,6 +263,7 @@ router.get("/admin/calendar", function(req, res) {
 router.get("/admin", function(req, res) {
     res.render("admin/index");
 });
+
 router.get("/admin/calendar/comps/fetch", function (req, res){  
     var id = req.query.eventorId;
     var options = {
@@ -603,7 +619,7 @@ function saveRunner(newRunner) {
     });
 }
 
-function getCompsForRunner(runner, year) {
+function getCompsForRunner(runner, year, io) {
     var runnerId = runner.eventorId;
     // console.log("Found runner: " + runner.nameGiven + " " + runner.nameFamily);
     var options = {
@@ -616,17 +632,18 @@ function getCompsForRunner(runner, year) {
         request(options, function(error, response, body) {
             if (error || response.statusCode != 200) {
                 console.log("error 7.1: " + error);
+                resolve();
                 // req.flash("error", "Nu blev det knas i steg 7.1 :-(");
                 // reject(err);
             } else {
-                getAndSaveCompetitions(runner, body, year);
+                getAndSaveCompetitions(runner, body, year, io);
                 resolve();
             }
         });
     });
 }
 
-function getAndSaveCompetitions(runner, body, year) {
+function getAndSaveCompetitions(runner, body, year, io) {
     var runnerId = runner.eventorId;
     parseXMLString(body, function(err, result) {
         if (err) {
@@ -634,6 +651,7 @@ function getAndSaveCompetitions(runner, body, year) {
         } else if (result.ResultListList.ResultList == undefined) {
         } else {
             console.log("Found results for runner: " + runner.nameGiven + " " + runner.nameFamily);
+            io.sockets.emit('refresh status', "Hittade resultat för " + year + " för " + runner.nameGiven + " " + runner.nameFamily);
             var competitionsArray = [];
             result.ResultListList.ResultList.forEach(function(comp) {
                 var eventorId = comp.Event[0].EventId;
@@ -812,11 +830,9 @@ function getAndSaveCompetitions(runner, body, year) {
     });
 }
 
-function calculatePoints(runner) {
+function calculatePoints(runner, io) {
+// function calculatePoints(runner) {
     return new Promise((resolve, reject) => {
-        if (runner.competitions.length == 0) {
-            // No results stored for the runner
-        }
         runner.competitions.forEach(function(comp) {
             var klar = false;
             var basePoints = 0;
@@ -906,12 +922,12 @@ function calculatePoints(runner) {
             });
         });
         console.log("Beräknat poäng för löpare: " + runner.nameGiven + " " + runner.nameFamily);
+        // io.sockets.emit('refresh status', "Poäng beräknat och sparat för " + year + " för " + runner.nameGiven + " " + runner.nameFamily);
         resolve();
-    });
-    
+    });    
 }
 
-function calculateCupPoints(runner) {
+function calculateCupPoints(runner, io) {
     var totalPointsOrion1000 = 0;
     var wins = 0;
     var results = [];
@@ -941,6 +957,7 @@ function calculateCupPoints(runner) {
                                 console.log(err);
                                 reject(err);
                             }
+                            // io.sockets.emit('refresh status', "Beräknat poäng för Spring till 1000 och Orionpokalen " + year + " för " + runner.nameGiven + " " + runner.nameFamily);
                             console.log("Beräknat poäng för " + runner.nameGiven + " " + runner.nameFamily);
                             resolve();
                         });            

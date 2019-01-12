@@ -22,7 +22,7 @@
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
-        <a class="navbar-brand" href="/test/landing1">
+        <a class="navbar-brand" href="/home">
             <img src="http://www.okorion.com/images/orionlog.gif" width="30" height="30" class="d-inline-block align-top" alt="">
             OK Orion
         </a>
@@ -32,49 +32,62 @@
         
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/orion1000/2018">Orion till 1000 - 2018</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/orionpokalen/2018">Orionpokalen 2018</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/resultat/runners/A/2018">Resultat 2018</a>
-                </li>
-                <li class="nav-item">
                     <a class="nav-link" href="/calendar">Kalender</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Spring till 1000
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="/orion1000/2019">Orion till 1000 - 2019</a>
+                        <a class="dropdown-item" href="/orion1000/2018">Orion till 1000 - 2018</a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Orionpokalen
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="/orionpokalen/2019">Orionpokalen - 2019</a>
+                        <a class="dropdown-item" href="/orionpokalen/2018">Orionpokalen - 2018</a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Resultat
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="/resultat/runners/A/2019">Resultat - 2019</a>
+                        <a class="dropdown-item" href="/resultat/runners/A/2018">Resultat - 2018</a>
+                    </div>
                 </li>
             </ul>
             <ul class="navbar-nav ml-auto">
+            <% if (currentUser) { %>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Admin
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="/admin/calendar">Kalendern</a>
-                        <a class="dropdown-item" href="/admin/calendar/comps/2019">Tävlingsprogram 2019</a>
-                        <a class="dropdown-item" href="/comps/test/21851">Test</a>
-                        <a class="dropdown-item" href="/test/chat">Chat</a>
-                        <% if (currentUser) { %>
+                        <!-- <a class="dropdown-item" href="/test/chat">Chat</a> -->
                         <a class="dropdown-item" href="/admin">Adminsidan</a>
-                        <a class="dropdown-item" href="/admin/runners/refresh/2018">Uppdatera resultat 2018</a>
-                        <a class="dropdown-item" href="/admin/runners/refresh/2019">Uppdatera resultat 2019</a>
                         <a class="dropdown-item" href="/admin/todo">Kvar att göra</a>
-                        <% } %>
                     </div>
                 </li>
-                <% if (currentUser) { %>
-                    <li class="nav-item my-2 my-lg-0">
-                        <a href=#  class="nav-link"><%= currentUser.nameGiven %> <%= currentUser.nameFamily %></a>
-                    </li>
-                    <li class="nav-item my-2 my-lg-0">
-                        <a href="/logout" class="nav-link">Logga ut</a>
-                    </li>
-                <% } else { %>
-                    <li class="nav-item my-2 my-lg-0">
-                        <a href="/login" class="nav-link">Logga in</a>
-                    </li>
-                <% } %>
+            <% } %>
+            <% if (currentUser) { %>
+                <li class="nav-item my-2 my-lg-0">
+                    <a href=#  class="nav-link"><%= currentUser.nameGiven %> <%= currentUser.nameFamily %></a>
+                </li>
+                <li class="nav-item my-2 my-lg-0">
+                    <a href="/logout" class="nav-link">Logga ut</a>
+                </li>
+            <% } else { %>
+                <li class="nav-item my-2 my-lg-0">
+                    <a href="/login" class="nav-link">Logga in</a>
+                </li>
+            <% } %>
             </ul>
         </div>
     </nav>

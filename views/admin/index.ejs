@@ -2,30 +2,95 @@
 <% include ../partials/header %>
 
 <div class="container">
+    <div class="row my-3">
+        <div class="col">
+            <span id="resultSpan" class="alert"></span>
+        </div>
+    </div>
     <div class="row">
         <div class="col">
             <h1>Hämta Resultat från Eventor</h1>
         </div>
     </div>
     <div class="row">
-        <div class="col">
-            <input class="btn btn-danger" id="refresh2019" value="Hämta för 2019">
+        <div class="col-sm-3 col-lg-2 mb-3">
+            <button class="btn btn-danger" id="refresh2018">Hämta för 2018</button>
+        </div>
+        <div class="col-sm-3 col-lg-2 mb-3">
+            <button class="btn btn-danger" id="refresh2019">Hämta för 2019</button>
         </div>
     </div>
-</div>
-<ul id="messages"></ul>
+    <div class="row my-3">
+        <div class="col">
+            <ul id="messages" class="list-unstyled"></ul>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col d-sm-none">
+            <h1>Annat</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6  d-none d-sm-block">
+            <h1>Tävlingskalender</h1>
+        </div>
+        <div class="col-sm-6  d-none d-sm-block">
+            <h1>Kalendern</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6 mb-3">
+                <a class="btn btn-primary" href="/admin/calendar/comps/2019">Redigera Tävlingsprogram 2019</a>
+        </div>
+        <div class="col-sm-6 mb-3">
+                <a class="btn btn-primary" href="/admin/calendar">Redigera kalendern</a>
+        </div>
+    </div>
 <script src="/static/js/socket.io.js"></script>
 <script>
     $(function () {
         var socket = io();
         socket.on('refresh status', function(msg){
-            $('#messages').append($('<li>').text(msg));
+            if (msg.indexOf("ERROR") != -1) {
+                $('#messages').prepend($('<li class="text-danger">').text(msg));
+            } else {
+                $('#messages').prepend($('<li>').text(msg));
+            }
         });
     });
 </script>
 <script type="text/javascript">            
+    $('#resultSpan').text("");
+    $('#resultSpan').removeClass("alert-danger");
+    $('#resultSpan').removeClass("alert-success");
+    $('#refresh2018').click(function(){  
+        $.ajax({
+            url: "/admin/runners/refresh/2018",
+            data: {}, 
+            success: function(data){
+                $('#resultSpan').text("Det gick ju fint");
+            },
+            error: function(jqXHR, textStatus, err){
+                $('#resultSpan').text("Abbans :-( " + textStatus  + ": " + err);
+            }
+        });
+    });
     $('#refresh2019').click(function(){  
-        
+        $('#resultSpan').text("");
+        $('#resultSpan').removeClass("alert-danger");
+        $('#resultSpan').removeClass("alert-success");
+        $.ajax({
+            url: "/admin/runners/refresh/2019",
+            data: {}, 
+            success: function(data){
+                $('#resultSpan').addClass("alert-success");
+                $('#resultSpan').text("Det gick ju fint");
+            },
+            error: function(jqXHR, textStatus, err){
+                $('#resultSpan').addClass("alert-danger");
+                $('#resultSpan').text("Abbans :-( " + textStatus  + ": " + err);
+            }
+        });
     });
 </script>
 <% include ../partials/footer %>

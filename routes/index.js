@@ -9,6 +9,10 @@ var parseXMLString  = require('xml2js').parseString;
 var API_KEY = "a7ff03d951bf4584a848df74aca6768d";
 
 router.get("/", function(req, res) {
+    res.render("test/landing1");
+});
+
+router.get("/home", function(req, res) {
     CalendarEvent.find({}, function(err, events) {
         if(err) {
             console.log(err);
@@ -24,12 +28,12 @@ router.get("/login", function(req, res) {
 });
 
 router.post("/login", passport.authenticate('custom', {failureRedirect: '/login'}), function(req, res) {
-    res.redirect("/");
+    res.redirect("/home");
 });
 
 router.get("/logout", function(req, res) {
     req.logout();
-    res.redirect("/");
+    res.redirect("/home");
 });
 
 router.get("/calendar", function(req, res) {
@@ -48,7 +52,7 @@ router.get("/calendar/fetch", function(req, res) {
         if(err) {
             console.log(err);
             req.flash("error", "Kunde inte hitta aktiviteten :-(");
-            res.redirect("/");
+            res.redirect("/home");
         }
         else {
             res.send({event: event});
