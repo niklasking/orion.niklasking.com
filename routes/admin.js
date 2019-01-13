@@ -605,6 +605,14 @@ function isLoggedIn(req, res, next) {
     res.redirect("/login");
 }
 
+function isProduction() {
+    var os = require('os');
+    if (os.hostname == 'server') {
+        return true;
+    } else {
+        return false;
+    }
+}
 function saveRunner(newRunner) {
     return new Promise((resolve, reject) => {
         newRunner.save(function(err, data) {

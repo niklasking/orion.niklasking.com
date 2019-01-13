@@ -9,7 +9,11 @@ var express         = require('express'),
     CustomStrategy  = require('passport-custom'),
     Tabulator       = require('tabulator-tables'),
     Runner          = require('./models/runner'),
-    Competition     = require('./models/competition');
+    Competition     = require('./models/competition'),
+    fs              = require('fs'),
+    http            = require('http'),
+    https           = require('https'),
+    helmet          = require('helmet');
 
 var indexRoutes         = require("./routes/index");
 var adminRoutes         = require("./routes/admin");
@@ -21,6 +25,7 @@ var API_KEY = "";
 var dbUrl = process.env.DATABASEURL || "mongodb://localhost/orionpokalen";
 mongoose.connect(dbUrl);
 
+
 var app = express();
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
@@ -28,8 +33,13 @@ app.use('/static', express.static('static'));
 app.use(flash());
 app.use(methodOverride("_method"));
 
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
+var io;
+if (isProduction()) {
+    io = require('socket.io')(https);
+    app.use(helmet());
+} else {
+    io = require('socket.io')(http);
+}
 app.io = io;
 
 io.on('connection', function(socket){
@@ -65,16 +75,17 @@ app.use(passport.session());
 
 passport.use('custom', new CustomStrategy(
     function(req, done) {
-        var eventorLogin = process.env.EVENTOR_LOGIN || "0";
-        if (eventorLogin == "0") {
+        // var eventorLogin = process.env.EVENTOR_LOGIN || "0";
+        // if (eventorLogin == "0") {
+        if (!isProduction()) {
             // ===================================================================
             // THIS IS A TEMPORARY SOLUTION - TO BE REMOVED WHEN USING EVENTOR
             // ===================================================================
-            if (req.body.username == "orion" && req.body.password == "OrionVinner10mila2019") {
+            if (req.body.username == "orion" && req.body.password == "hej") {
                 var user = {
                     eventorId:          "12345",
                     nameFamily:         "Orion",
-                    nameGiven:          "OK",
+                    nameGiven:          "Admin",
                     phoneNumber:        "123456789",
                     mobilePhoneNumber:  "987654321",
                     mailAddress:        "orion@orion.orion"
@@ -166,8 +177,26 @@ app.use("/", adminRoutes);
 app.use("/", resultsRoutes);
 app.use("/", playgroundRoutes);
 
-// var server = app.listen(4455, process.env.IP, function() {
-var server = http.listen(4455, process.env.IP, function() {
-// var server = app.listen(process.env.PORT, process.env.IP, function() {
-    console.log("Orionpokalen is started at port: " + server.address().port);
-});
+if (isProduction()){
+    const options = {
+        key: fs.readFileSync("/etc/letsencrypt/live/niklasking.com/privkey.pem"),
+        cert: fs.readFileSync("/etc/letsencrypt/live/niklasking.com/fullchain.pem")
+    };
+    https.createServer(options, app).listen(443);
+    console.log("Server started at port 443.");
+} else {
+    // var server = http.listen(4455, process.env.IP, function() {
+    // var server = app.listen(process.env.PORT, process.env.IP, function() {
+    http.createServer(app).listen(4455);
+    console.log("Orionpokalen is started at port 4455.");    
+    // });
+}
+
+function isProduction() {
+    var os = require('os');
+    if (os.hostname == 'server') {
+        return true;
+    } else {
+        return false;
+    }
+}
