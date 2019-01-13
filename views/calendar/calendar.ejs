@@ -181,7 +181,9 @@
                     <input type="hidden" name="orgId" id="form-orgId">
                     <input type="hidden" name="year" id="form-year"> -->
 
-                    <button id="changeButton" type="submit" class="btn btn-secondary mt-2">Ändra/Ta bort</button>
+                    <% if (currentUser) { %>
+                        <button id="changeButton" type="submit" class="btn btn-secondary mt-2">Ändra/Ta bort</button>
+                    <% } %>
                 </form>
             </div>
         </div>
@@ -228,4 +230,5 @@
         }
     }
 </script>
+
 <% include ../partials/footer %>

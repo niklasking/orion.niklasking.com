@@ -226,7 +226,9 @@
             <div class="modal-footer">
                     <span style="display: none;" id="modelEditUrl"></span>
                     <!-- <span id="modelEditUrl"></span> -->
-                    <button type="button" id="changeButton" class="btn btn-secondary" data-dismiss="modal">Ändra/Ta bort</button>
+                    <% if (currentUser) { %>
+                        <button type="button" id="changeButton" class="btn btn-secondary" data-dismiss="modal">Ändra/Ta bort</button>
+                    <% } %>
                     <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
             </div>
         </div>

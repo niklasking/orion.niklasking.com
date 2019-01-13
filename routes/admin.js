@@ -260,7 +260,7 @@ router.get("/admin/calendar", function(req, res) {
     });    
 });
 
-router.get("/admin", function(req, res) {
+router.get("/admin", isLoggedIn, function(req, res) {
     res.render("admin/index");
 });
 
@@ -346,7 +346,7 @@ router.get("/admin/calendar/comps/fetch", function (req, res){
     });
 });
 
-router.post("/admin/calendar/comps", function(req, res) {
+router.post("/admin/calendar/comps", isLoggedIn, function(req, res) {
     var eventsPromise = new Promise(function(resolve, reject) {
         CalendarEvent.find({eventorId: { $ne: undefined }}, function(err, existingEvents) {
             if(err) {
@@ -526,7 +526,7 @@ router.post("/admin/calendar/comps", function(req, res) {
     });
 });
 
-router.delete("/admin/calendar/comps/:id", function(req,res) {
+router.delete("/admin/calendar/comps/:id", isLoggedIn, function(req,res) {
     var year = req.body.year;
     CalendarEvent.findByIdAndRemove(req.params.id, function(err) {
         if (err) {
@@ -538,7 +538,7 @@ router.delete("/admin/calendar/comps/:id", function(req,res) {
     });
 });
 
-router.post("/admin/calendar", function(req, res) {
+router.post("/admin/calendar", isLoggedIn, function(req, res) {
     var title = decodeURIComponent(req.body.title);
     var start = req.body.start;
     var className = req.body.className;

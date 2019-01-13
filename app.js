@@ -33,13 +33,26 @@ app.use('/static', express.static('static'));
 app.use(flash());
 app.use(methodOverride("_method"));
 
-var io;
+// var io;
+var server;
 if (isProduction()) {
-    io = require('socket.io')(https);
     app.use(helmet());
+        const options = {
+        key: fs.readFileSync("/etc/letsencrypt/live/niklasking.com/privkey.pem"),
+        cert: fs.readFileSync("/etc/letsencrypt/live/niklasking.com/fullchain.pem")
+    };
+
+    server = https.Server(options, app);
+    server.listen(443);
+    console.log("Server started at port 443.");
+    // io = require('socket.io')(https);
 } else {
-    io = require('socket.io')(http);
+    server = http.Server(app);
+    server.listen(4455);
+    console.log("Server started at port 4455.");
+    // io = require('socket.io')(http);
 }
+var io = require('socket.io')(server);
 app.io = io;
 
 io.on('connection', function(socket){
@@ -177,20 +190,20 @@ app.use("/", adminRoutes);
 app.use("/", resultsRoutes);
 app.use("/", playgroundRoutes);
 
-if (isProduction()){
-    const options = {
-        key: fs.readFileSync("/etc/letsencrypt/live/niklasking.com/privkey.pem"),
-        cert: fs.readFileSync("/etc/letsencrypt/live/niklasking.com/fullchain.pem")
-    };
-    https.createServer(options, app).listen(443);
-    console.log("Server started at port 443.");
-} else {
-    // var server = http.listen(4455, process.env.IP, function() {
-    // var server = app.listen(process.env.PORT, process.env.IP, function() {
-    http.createServer(app).listen(4455);
-    console.log("Orionpokalen is started at port 4455.");    
-    // });
-}
+// if (isProduction()){
+//     const options = {
+//         key: fs.readFileSync("/etc/letsencrypt/live/niklasking.com/privkey.pem"),
+//         cert: fs.readFileSync("/etc/letsencrypt/live/niklasking.com/fullchain.pem")
+//     };
+//     https.createServer(options, app).listen(443);
+//     console.log("Server started at port 443.");
+// } else {
+//     // var server = http.listen(4455, process.env.IP, function() {
+//     // var server = app.listen(process.env.PORT, process.env.IP, function() {
+//     http.createServer(app).listen(4455);
+//     console.log("Orionpokalen is started at port 4455.");    
+//     // });
+// }
 
 function isProduction() {
     var os = require('os');
