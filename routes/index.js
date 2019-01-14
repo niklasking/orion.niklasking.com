@@ -117,12 +117,16 @@ router.get("/calendar/comp/fetch", function(req, res) {
         });
 });
 
-function isLoggedIn(req, res, next) {
-    if (req.isAuthenticated()) {
-        return next();
-    }
-    res.redirect("/login");
-}
+router.get("/ungdom", function(req, res) {
+    res.render("ungdom/index");
+});
+
+// function isLoggedIn(req, res, next) {
+//     if (req.isAuthenticated()) {
+//         return next();
+//     }
+//     res.redirect("/login");
+// }
 
 function getOrionEntries(events) {
     var entires = [];

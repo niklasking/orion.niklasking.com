@@ -13,7 +13,8 @@ var express         = require('express'),
     fs              = require('fs'),
     http            = require('http'),
     https           = require('https'),
-    helmet          = require('helmet');
+    helmet          = require('helmet'),
+    middleware      = require('./middleware');
 
 var indexRoutes         = require("./routes/index");
 var adminRoutes         = require("./routes/admin");
@@ -56,9 +57,9 @@ var io = require('socket.io')(server);
 app.io = io;
 
 io.on('connection', function(socket){
-    console.log('A USER is connected');
+    // console.log('A USER is connected');
     socket.on('disconnect', function(){
-      console.log('A USER got disconnected');
+    //   console.log('A USER got disconnected');
     });
 });
 // io.on('connection', function(socket){
@@ -96,7 +97,7 @@ passport.use('custom', new CustomStrategy(
             // ===================================================================
             if (req.body.username == "orion" && req.body.password == "hej") {
                 var user = {
-                    eventorId:          "12345",
+                    eventorId:          "27788",
                     nameFamily:         "Orion",
                     nameGiven:          "Admin",
                     phoneNumber:        "123456789",
@@ -172,7 +173,7 @@ passport.deserializeUser(function(user, done) {
 });
 
 app.use(function(req, res, next) {
-    res.locals.currentUser = req.user;
+    res.locals.currentUser  = req.user;
     res.locals.error        = req.flash("error");
     res.locals.success      = req.flash("success");
     next();

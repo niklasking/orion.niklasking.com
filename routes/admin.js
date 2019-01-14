@@ -6,16 +6,182 @@ var express         = require('express'),
     passport        = require('passport'),
     Runner          = require('../models/runner'),
     Competition     = require('../models/competition'),
-    CalendarEvent   = require('../models/calendarEvent');
+    CalendarEvent   = require('../models/calendarEvent'),
+    User            = require('../models/user'),
+    middleware      = require("../middleware");
 
 var ORINGEN_ELITSPRINT = 24317;
 var API_KEY = "a7ff03d951bf4584a848df74aca6768d";
+
+router.get("/admin", middleware.isLoggedIn, function(req, res) {
+    var superAdmin = "no";
+    User.find({eventorId: req.user.eventorId}, function(err, users) {
+        if(err) {
+        }
+        else {
+            if (users.length > 0) {
+                for (var i = 0; i < users[0].roles.length; i++) {
+                    if (users[0].roles[i] == "superadmin") {
+                        superAdmin = "yes";
+                        break;
+                    }
+                }
+                res.render("admin/index", {superAdmin: superAdmin});
+            }
+        }
+    });   
+});
 
 router.get("/admin/todo", function(req, res) {
     res.render("admin/todo");
 });
 
-router.get("/admin/runners/refresh/:year", isLoggedIn, function(req, res) {
+router.get("/admin/runner", middleware.isSuperAdmin, function(req, res) {
+    var year = new Date().getFullYear();
+    var query = Runner.
+                find({ resultYear: year }).
+                sort({ nameFamily: 1, nameGiven: 1 });
+    query.exec(function(err, runners) { 
+        if(err) {
+            res.send({runners: runners, error: "Kunde inte hämta medlemmar. " + err});
+        }
+        else {
+            res.send({runners: runners, error: ""});
+        }
+    });    
+});
+
+router.get("/admin/user", middleware.isSuperAdmin, function(req, res) {
+    var query = User.
+                find({}).
+                sort({ nameFamily: 1, nameGiven: 1 });
+                // populate("roles");
+    query.exec(function(err, users) { 
+        if(err) {
+            res.send({users: users, error: "Kunde inte hämta användare. " + err});
+        }
+        else {
+            res.send({users: users, error: ""});
+        }
+    });    
+});
+
+router.post("/admin/user", middleware.isSuperAdmin, function(req, res) {
+    var eventorId = req.body.eventorId;
+    var newRole = req.body.role;
+    var query = Runner.
+                find({eventorId: eventorId});
+    query.exec(function(err, runners) { 
+        if (err) {
+            req.flash("error", "ERROR 1: Kunde inte lägga till roll till användaren.");
+            res.redirect("/admin");
+        } else {
+            if (runners.length == 0) {
+                req.flash("error", "ERROR 2: Kunde inte lägga till roll till användaren.");
+                res.redirect("/admin");
+            } else {
+                var nameGiven = runners[0].nameGiven;
+                var nameFamily = runners[0].nameFamily;
+                var query2 = User.
+                find({eventorId: eventorId});
+                    query2.exec(function(err, users) { 
+                        if(err) {
+                            req.flash("error", "ERROR 3: Kunde inte lägga till roll till användaren.");
+                            res.redirect("/admin");
+                                        }
+                        else {
+                            if (users.length > 0) {
+                                // Användaren finns redan.
+                                var found = false;
+                                for (var i = 0; i < users[0].roles.length; i++) {
+                                    if (users[0].roles[i] == newRole) {
+                                        found = true;
+                                        break;
+                                    }
+                                }
+                                if (found) {
+                                    req.flash("error", "Användaren har redan denna roll.");
+                                    res.redirect("/admin");
+                                } else {
+                                    var roles = users[0].roles;
+                                    roles.push(newRole);
+                                    User.findByIdAndUpdate(users[0]._id, {roles: roles}, function(err, updatedCalendarEvent) {
+                                        if (err) {
+                                            req.flash("error", "ERROR 4: Kunde inte lägga till roll till användaren.");
+                                            res.redirect("/admin");
+                                        } else {
+                                            req.flash("success", "Roll tillagd till användare.");
+                                            res.redirect("/admin");
+                                        }
+                                    });                        
+                                }
+                            } else {
+                                // Användaren finns inte.
+                                var roles = [];
+                                roles.push(newRole);
+                                var newUser = new User({
+                                                nameGiven: nameGiven,
+                                                nameFamily: nameFamily,
+                                                eventorId: eventorId,
+                                                roles: roles
+                                });
+                                User.create(newUser, function(err, justCreatedUser) {
+                                    if(err) {
+                                        req.flash("error", "ERROR 5: Kunde inte lägga till roll till användaren.");
+                                        res.redirect("/admin");
+                                    }
+                                    else {
+                                        req.flash("success", "Roll tillagd till användare.");
+                                        res.redirect("/admin");
+                                    }
+                                }); 
+                            }
+                        }
+                    });    
+
+            }
+        }
+    });
+});
+
+router.delete("/admin/user/:id", middleware.isSuperAdmin, function(req, res) {
+    var eventorId = req.params.id;
+    var oldRole = req.body.role;
+    // 1. Find user.
+    // 2. Remove role from roles array.
+    var query = User.
+    find({eventorId: eventorId});
+    query.exec(function(err, users) { 
+        if(err) {
+            req.flash("error", "ERROR 1: Kunde inte ta bort rollen.");
+            res.redirect("/admin");
+        } else {
+            if (users.length == 0) {
+                req.flash("error", "ERROR 2: Kunde inte ta bort rollen.");
+                res.redirect("/admin");
+            } else {
+                var user = users[0];
+                var roles = [];
+                user.roles.forEach(function(role) {
+                    if (oldRole != role) {
+                        roles.push(role);
+                    }
+                });
+                User.findByIdAndUpdate(user._id, {roles: roles}, function(err, updatedCalendarEvent) {
+                    if (err) {
+                        req.flash("error", "ERROR 3: Kunde inte ta bort rollen.");
+                        res.redirect("/admin");
+                    } else {
+                        req.flash("success", "Rollen borttagen från användaren.");
+                        res.redirect("/admin");
+                    }
+                });    
+            }
+        }
+    });
+});
+
+router.get("/admin/runners/refresh/:year", middleware.isSuperAdmin, function(req, res) {
     var year = req.params.year;
     var options = {
         url: 'https://eventor.orientering.se/api/persons/organisations/288',
@@ -234,7 +400,6 @@ router.get("/admin/runners/refresh/:year", isLoggedIn, function(req, res) {
 
 });
 
-
 // CALENDAR
 router.get("/admin/calendar", function(req, res) {
     var date = req.query.date;
@@ -258,10 +423,6 @@ router.get("/admin/calendar", function(req, res) {
             res.render("admin/calendar/new", {event_list: events, date: date, _id: _id, title: title, className: className, lat: lat, lng: lng, ansvarig: ansvarig, link: link, description: description, eventorId: eventorId, orgId: orgId});
         }
     });    
-});
-
-router.get("/admin", isLoggedIn, function(req, res) {
-    res.render("admin/index");
 });
 
 router.get("/admin/calendar/comps/fetch", function (req, res){  
@@ -346,7 +507,7 @@ router.get("/admin/calendar/comps/fetch", function (req, res){
     });
 });
 
-router.post("/admin/calendar/comps", isLoggedIn, function(req, res) {
+router.post("/admin/calendar/comps", middleware.isLoggedIn, function(req, res) {
     var eventsPromise = new Promise(function(resolve, reject) {
         CalendarEvent.find({eventorId: { $ne: undefined }}, function(err, existingEvents) {
             if(err) {
@@ -526,7 +687,7 @@ router.post("/admin/calendar/comps", isLoggedIn, function(req, res) {
     });
 });
 
-router.delete("/admin/calendar/comps/:id", isLoggedIn, function(req,res) {
+router.delete("/admin/calendar/comps/:id", middleware.isLoggedIn, function(req,res) {
     var year = req.body.year;
     CalendarEvent.findByIdAndRemove(req.params.id, function(err) {
         if (err) {
@@ -538,7 +699,7 @@ router.delete("/admin/calendar/comps/:id", isLoggedIn, function(req,res) {
     });
 });
 
-router.post("/admin/calendar", isLoggedIn, function(req, res) {
+router.post("/admin/calendar", middleware.isLoggedIn, function(req, res) {
     var title = decodeURIComponent(req.body.title);
     var start = req.body.start;
     var className = req.body.className;
@@ -598,21 +759,26 @@ router.post("/admin/calendar", isLoggedIn, function(req, res) {
     }
 });
 
-function isLoggedIn(req, res, next) {
-    if (req.isAuthenticated()) {
-        return next();
-    }
-    res.redirect("/login");
-}
+router.get("/admin/ungdom", middleware.isUngdomAdmin, function(req, res) {
+    res.render("admin/ungdom/index");
+});
 
-function isProduction() {
-    var os = require('os');
-    if (os.hostname == 'server') {
-        return true;
-    } else {
-        return false;
-    }
-}
+// function isLoggedIn(req, res, next) {
+//     if (req.isAuthenticated()) {
+//         return next();
+//     }
+//     res.redirect("/login");
+// }
+
+// function isProduction() {
+//     var os = require('os');
+//     if (os.hostname == 'server') {
+//         return true;
+//     } else {
+//         return false;
+//     }
+// }
+
 function saveRunner(newRunner) {
     return new Promise((resolve, reject) => {
         newRunner.save(function(err, data) {
@@ -975,5 +1141,33 @@ function calculateCupPoints(runner, io) {
         });
     });
 }
+
+// function isSuperAdmin(user) {
+//     var query = User.
+//                 find({eventorId: user.eventorId});
+//     query.exec(function(err, users) { 
+//         if(err) {
+//             return "no";
+//         } else {
+//             if (users.length == 0) {
+//                 return "no";
+//             } else {
+//                 var found = false;
+//                 for (var i = 0; i < users[0].roles.length; i++) {
+//                     if (users[0].roles[i] === "superadmin") {
+//                         found = true;
+//                         break;
+//                     }
+//                 }
+//                 if (found) {
+//                     return "yes";
+//                 } else {
+//                     return "no";
+//                 }
+//             }
+//         }
+//     });  
+//     return "XXX";
+// }
 
 module.exports = router;
