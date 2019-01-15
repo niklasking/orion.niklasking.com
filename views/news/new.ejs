@@ -1,0 +1,38 @@
+<% include ../partials/header %>
+<link rel="stylesheet" href="/static/css/news.css">
+<script src="/static/js/news.js"></script>
+<div class="container">
+    <h1>Skapa en Nyhet</h1>
+    <!-- <form action=""> -->
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Nyhet</span>
+            </div>
+            <div id="news-input" class="form-control news-input text-secondary" data-placeholder="Vad händer?" contenteditable="true"></div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <table>
+                    <tr>
+                        <td><button class="emoji">&#x1F386</button></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <button id="add-emoji">Add</button>
+    <!-- </form> -->
+    <ul class="nav nav-pills mb-3" id="emojis-tab" role="tablist">        
+    </ul>
+    <div class="tab-content" id="emojis-tabContent">
+
+    </div>
+    <hr>
+    <div id="emojs">
+        <table id="emoji-table"></table>
+    </div>
+    <hr>
+    <div>
+            Nisse&nbsp;<img src="https://cdn.okccdn.com/media/img/emojis/apple/1F60C.png" width="20px" height="20px">&nbsp;Ville bli sjöman<img src="https://cdn.okccdn.com/media/img/emojis/apple/1F60C.png" width="20px" height="20px"><div>och segla</div><div>till Jamijka</div><div><img class="text-center" src="https://cdn.okccdn.com/media/img/emojis/apple/1F60C.png" width="20px" height="20px"><br></div>
+    </div>
+</div>
+<% include ../partials/footer %>
