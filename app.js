@@ -19,6 +19,7 @@ var express         = require('express'),
 var indexRoutes         = require("./routes/index");
 var adminRoutes         = require("./routes/admin");
 var resultsRoutes       = require("./routes/results");
+var newsRoutes          = require("./routes/news");
 var playgroundRoutes    = require("./routes/playground");
 
 var API_KEY = "";
@@ -190,6 +191,7 @@ db.once('open', function() {
 app.use("/", indexRoutes);
 app.use("/", adminRoutes);
 app.use("/", resultsRoutes);
+app.use("/", newsRoutes);
 app.use("/", playgroundRoutes);
 
 // if (isProduction()){
