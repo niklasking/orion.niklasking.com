@@ -45,6 +45,7 @@ if (isProduction()) {
 
     server = https.Server(options, app);
     server.listen(443);
+    app.listen(80);
     console.log("Server started at port 443.");
     // io = require('socket.io')(https);
 } else {
