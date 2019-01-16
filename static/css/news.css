@@ -6,3 +6,7 @@
 .news-input:empty:not(:focus):before {
     content: attr(data-placeholder)
   }
+
+  .input-option {
+    border-radius: 15px 15px;
+  }

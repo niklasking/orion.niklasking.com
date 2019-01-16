@@ -6,33 +6,59 @@
     <!-- <form action=""> -->
         <div class="input-group">
             <div class="input-group-prepend">
-                <span class="input-group-text">Nyhet</span>
+                <span class="input-group-text">Rubrik</span>
             </div>
-            <div id="news-input" class="form-control news-input text-secondary" data-placeholder="Vad händer?" contenteditable="true"></div>
+            <!-- <input type="text" id="rubrik" class="form-control" placeholder="Rubrik" value="<%= uploadedFile %>"> -->
+            <input type="text" id="rubrik" class="form-control" placeholder="Rubrik">
         </div>
-        <div class="row">
-            <div class="col">
-                <table>
-                    <tr>
-                        <td><button class="emoji">&#x1F386</button></td>
-                    </tr>
-                </table>
+        <div class="input-group mt-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Nyhet&nbsp;</span>
+            </div>
+            <div id="news-input" class="form-control news-input text-secondary" data-placeholder="Vad har hänt, eller vad ska hända?" contenteditable="true">
+                <!-- <%= newsContent %> -->
             </div>
         </div>
-        <button id="add-emoji">Add</button>
+        <div class="row mt-3 mx-1 border rounded">
+            <div class="col-2 d-flex align-items-center">
+                <!-- <a class="text-secondary" data-toggle="collapse" role="button" data-target="#emojisDiv" aria-expanded="false" aria-controls="emojisDiv">Lägg till i nyheten ...</a> -->
+                Lägg till i nyheten ...
+            </div>
+            <div class="col my-1">
+                <a class="input-option btn bg-light text-secondary" data-toggle="collapse" role="button" data-target="#emojisDiv" aria-expanded="false" aria-controls="emojisDiv">😀 Känsla/aktivitet/klubb</a>
+                <a class="input-option btn bg-light text-secondary ml-3" data-toggle="collapse" role="button" data-target="#pictureDiv" aria-expanded="false" aria-controls="pictureDiv">
+                    <img src="/static/imgs/facebook_images.png" height="20px" alt=""> Bild
+                </a>
+                <a class="input-option btn bg-light text-secondary ml-3" data-toggle="collapse" role="button" data-target="#emojisDiv" aria-expanded="false" aria-controls="emojisDiv">
+                    <img src="/static/imgs/link.png" height="20px" alt=""> Länk
+                </a>
+            </div>
+        </div>
+        <div id="emojisDiv" class="collapse mt-3 mx-1">
+            <ul class="nav nav-pills mb-3" id="emojis-tab" role="tablist"></ul>
+            <div class="tab-content" id="emojis-tabContent"></div>
+            <div id="emojs">
+                <table id="emoji-table"></table>
+            </div>
+        </div>
+        <div id="pictureDiv" class="collapse mt-3 mx-1">
+            <h3>Infoga bild</h3>
+            <h4>Leta efter en gammal bild</h4>
+            <div class="custom-file">
+                <input type="file" class="custom-file-input" id="existingFile">
+                <label class="custom-file-label" for="existingFile">Choose file</label>
+            </div>
+            <hr>
+            <form action="/news/img/upload" id="uploadForm" enctype="multipart/form-data" method="POST">
+            <!-- <form action="/news/img/upload" id="uploadForm" method="POST"> -->
+                <input type="file" name="upload" multiple>
+                <input type="hidden" id="newsContent" name="newsContent">
+                <input type="submit" id="uploadFileButton" value="Upload">
+            </form>
+        </div>
+        <hr>
+        <button class="btn btn-primary" id="add-emoji">Spara nyhet</button>
     <!-- </form> -->
-    <ul class="nav nav-pills mb-3" id="emojis-tab" role="tablist">        
-    </ul>
-    <div class="tab-content" id="emojis-tabContent">
-
-    </div>
-    <hr>
-    <div id="emojs">
-        <table id="emoji-table"></table>
-    </div>
-    <hr>
-    <div>
-            Nisse&nbsp;<img src="https://cdn.okccdn.com/media/img/emojis/apple/1F60C.png" width="20px" height="20px">&nbsp;Ville bli sjöman<img src="https://cdn.okccdn.com/media/img/emojis/apple/1F60C.png" width="20px" height="20px"><div>och segla</div><div>till Jamijka</div><div><img class="text-center" src="https://cdn.okccdn.com/media/img/emojis/apple/1F60C.png" width="20px" height="20px"><br></div>
-    </div>
+    <div class="border my-3" id="output"></div>
 </div>
 <% include ../partials/footer %>

@@ -1,6 +1,5 @@
 document.addEventListener('input', function (event) {
     if (!event.target.matches('.news-input')) return;
-    // if (event.target.tagName.toLowerCase() !== 'textarea') return;
     $('.news-input').removeClass("text-secondary");
     autoExpand(event.target);
 }, false);
@@ -22,55 +21,121 @@ var autoExpand = function (field) {
     field.style.height = height + 'px';
 };
 $(document).ready(function() {
-    $("#add-emoji").click(function() {
-        // document.getElementById('news-input').focus(); pasteHtmlAtCaret('<img src="https://cdn.okccdn.com/media/img/emojis/apple/1F60C.png" width=\"20px\" height=\"20px\"/>');
-        document.getElementById('news-input').focus(); pasteHtmlAtCaret('<span>&#x1F601;</span>');
-    });
-    // $("#add-emoji2").click(function() {
-    //     $("#oj").append('<img src="https://cdn.okccdn.com/media/img/emojis/apple/1F60C.png"/>');
-    // });
-    $('#get-news').click(function() {
-        console.log($('#news-input').html());
+    $('#add-emoji').click(function() {
+        $('#output').html("<h2>" + $('#rubrik').val() + "</h2>" + $('#news-input').html());
     });  
+
+    $('#pictureDiv').on('show.bs.collapse', function () {
+        $('#emojisDiv').collapse('hide');
+    });
+    $('#emojisDiv').on('show.bs.collapse', function () {
+        $('#pictureDiv').collapse('hide');
+    });
+
     $.getJSON('../../static/json/emojis.json', function(data) {         
         var i = 0;
-        var category = "";
-        var row = "<tr>";
-        var myArray = $.map(data, function(value, index) {
-                // console.log([value][0].char + " " + [value][0].category + " " + index);
-                i++;
-                if (category != [value][0].category) {
-                    if (category != "") {
-                        row += "</tr>";
-                        $('#' + category + '-table').append(row);    
-                    }
-                    category = [value][0].category;
-                    row = "<tr>";
-                    $('#emojis-tab').append(
-                        "<li class=\"nav-item\">" +
-                        "<a class=\"nav-link\" id=\"" + category + "-tab\" href=\"#" + category + " role=\"tab\" aria-controls=\"" + category + "\" >" + category + "</a>" +
-                        "</li>"
-                    );
-                    $('#emojis-tabContent').append(
-                        "<div class=\"tab-pane fade show\" id=\"" + category +"\" role=\"tabpanel\" aria-labelledby=\"" + category + "-tab\">" +
-                        "<table id=\"" + category + "-table\"></table>" +
-                        "</div>"
-                    );
-                    i = 1;
-                }
-                row +=  "<td>" + 
-                        "<button class=\"add-emoji\" data-toggle=\"tooltip\" title=\"" + index + "\">" + 
-                        "<span>" + [value][0].char + "</span>" + "</button>" +
-                        "</td>";
-                if ( i > 10) {
-                    i = 0;
-                    row += "</tr>";
-                    $('#' + category + '-table').append(row);
-                    row = "<tr>";
-                }
-            // }
+        var category = "Klubbar";
+        $('#emojis-tabContent').append(
+            "<div class=\"tab-pane fade active show\" id=\"" + category +"\" role=\"tabpanel\" aria-labelledby=\"" + category + "-tab\">" +
+            "<table id=\"" + category + "-table\"></table>" +
+            "</div>"
+        );
+        var row = "<tr><td>" + 
+                    "<button class=\"add-club\" data-toggle=\"tooltip\" title=\"" + "OK Orion" + 
+                    "\" style=\"background: url(https://eventor.orientering.se/Organisation/Logotype/288?type=MediumIcon); height: 32px; width: 32px;\" value=\"" + 
+                    "https://eventor.orientering.se/Organisation/Logotype/288?type=SmallIcon" + "\">" + "</button>" +
+                    "</td>";
+        row += "<td>" + 
+                    "<button class=\"add-club\" data-toggle=\"tooltip\" title=\"" + "Karlskrona SOK" + 
+                    "\" style=\"background: url(https://eventor.orientering.se/Organisation/Logotype/2698?type=MediumIcon); height: 32px; width: 32px;\" value=\"" + 
+                    "https://eventor.orientering.se/Organisation/Logotype/2698?type=SmallIcon" + "\">" + "</button>" +
+                    "</td>";
+        row += "<td>" + 
+                    "<button class=\"add-club\" data-toggle=\"tooltip\" title=\"" + "Ronneby OK" + 
+                    "\" style=\"background: url(https://eventor.orientering.se/Organisation/Logotype/310?type=MediumIcon); height: 32px; width: 32px;\" value=\"" + 
+                    "https://eventor.orientering.se/Organisation/Logotype/310?type=SmallIcon" + "\">" + "</button>" +
+                    "</td>";
+        row += "<td>" + 
+                    "<button class=\"add-club\" data-toggle=\"tooltip\" title=\"" + "OK Skogsfalken" + 
+                    "\" style=\"background: url(https://eventor.orientering.se/Organisation/Logotype/339?type=MediumIcon); height: 32px; width: 32px;\" value=\"" + 
+                    "https://eventor.orientering.se/Organisation/Logotype/339?type=SmallIcon" + "\">" + "</button>" +
+                    "</td>";
+        row += "<td>" + 
+                    "<button class=\"add-club\" data-toggle=\"tooltip\" title=\"" + "OL Teamet Ologström" + 
+                    "\" style=\"background: url(https://eventor.orientering.se/Organisation/Logotype/497?type=MediumIcon); height: 32px; width: 32px;\" value=\"" + 
+                    "https://eventor.orientering.se/Organisation/Logotype/497?type=SmallIcon" + "\">" + "</button>" +
+                    "</td>";
+        row += "<td>" + 
+                    "<button class=\"add-club\" data-toggle=\"tooltip\" title=\"" + "BroSö OK" + 
+                    "\" style=\"background: url(https://eventor.orientering.se/Organisation/Logotype/495?type=MediumIcon); height: 32px; width: 32px;\" value=\"" + 
+                    "https://eventor.orientering.se/Organisation/Logotype/495?type=SmallIcon" + "\">" + "</button>" +
+                    "</td></tr>";
+        $('#' + category + '-table').append(row);
+        $('#emojis-tab').append(
+            "<li class=\"nav-item\">" +
+            "<a class=\"nav-link active\" id=\"" + category + "-tab\" href=\"#" + category + "\" role=\"tab\" aria-controls=\"" + category + "\" data-toggle=\"pill\" >" + category + "</a>" +
+            "</li>"
+        );
+
+        row = "<tr>";
+        var emojisArray = $.map(data, function(value, index) {
+            if (category != value.category) {
+                row += "</tr>";
+                $('#' + category + '-table').append(row);    
+                category = value.category;
+                row = "<tr>";
+                $('#emojis-tab').append(
+                    "<li class=\"nav-item\">" +
+                    "<a class=\"nav-link\" id=\"" + category + "-tab\" href=\"#" + category + "\" role=\"tab\" aria-controls=\"" + category + "\" data-toggle=\"pill\" >" + category + "</a>" +
+                    "</li>"
+                );
+                $('#emojis-tabContent').append(
+                    "<div class=\"tab-pane fade\" id=\"" + category +"\" role=\"tabpanel\" aria-labelledby=\"" + category + "-tab\">" +
+                    "<table id=\"" + category + "-table\"></table>" +
+                    "</div>"
+                );
+                i = 0;
+            }
+            i++;
+            row +=  "<td>" + 
+                    "<button class=\"add-emoji\" data-toggle=\"tooltip\" title=\"" + index + "\" value=\"" + value.char + "\">" + 
+                    "<span>" + value.char + "</span>" + "</button>" +
+                    "</td>";
+            if ( i > 9) {
+                i = 0;
+                row += "</tr>";
+                $('#' + category + '-table').append(row);
+                row = "<tr>";
+            }
         });
     });
+    $(document).on("click", ".add-emoji", function (ev) {
+        document.getElementById('news-input').focus(); pasteHtmlAtCaret('<span>' + $(this).attr('value') + '</span>');
+    });
+    $(document).on("click", ".add-club", function (ev) {
+        document.getElementById('news-input').focus(); pasteHtmlAtCaret("<img src=\"" + $(this).attr('value') + "\">");
+    });
+
+    // $('#uploadFileButton').click(function() {
+        $("#uploadForm").submit(function(event){
+            event.preventDefault(); //prevent default action 
+            var post_url = $(this).attr("action"); //get form action url
+            var request_method = $(this).attr("method"); //get form GET/POST method
+            var form_data = $(this).serialize(); //Encode form elements for submission
+            
+            $.ajax({
+                url : post_url,
+                // type: "POST",
+                type: request_method,
+                // method: request_method,
+                data : form_data
+            }).done(function(response){ 
+                alert("HA HA HA");
+                $("#output").html(response);
+            });
+        });
+    // });  
+
 });
 
 function pasteHtmlAtCaret(html) {
