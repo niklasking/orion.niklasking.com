@@ -21,15 +21,56 @@ var autoExpand = function (field) {
     field.style.height = height + 'px';
 };
 $(document).ready(function() {
+    var now = new Date();
+    var endDate = moment(now).add(14, 'days').format('YYYY-MM-DD HH:mm:ss');
+    $('#datetimepickerValidTo').val(endDate);
+    var startDate = moment(now).format('YYYY-MM-DD HH:mm:ss');
+    $('#datetimepickerValidFrom').val(startDate);
+
+
     $('#add-emoji').click(function() {
-        $('#output').html("<h2>" + $('#rubrik').val() + "</h2>" + $('#news-input').html());
+        var s = ""
+        if ($('#nyhetKlubb').is(":checked"))
+        {
+            s += "<div>Visas på OK Orions sida.</div>";
+        }
+        if ($('#nyhetElit').is(":checked"))
+        {
+            s += "<div>Visas på elitsidan.</div>";
+        }
+        if ($('#nyhetUngdon').is(":checked"))
+        {
+            s += "<div>Visas på ungdomssidan.</div>";
+        }
+        if ($('#nyhetFacebook').is(":checked"))
+        {
+            s += "<div>Visas på OK Orions Facebooksida.</div>";
+        }
+
+        $('#output').html("<hr><h2>" + $('#rubrik').val() + "</h2>" + 
+                        $('#news-input').html() +
+                        "<div><strong>Visas till: </strong>" + $('#datetimepickerValidTo').val() + "</div>" +
+                        "<div><strong>Visas från: </strong>" + $('#datetimepickerValidFrom').val() + "</div>" +
+                        s
+        );
     });  
 
     $('#pictureDiv').on('show.bs.collapse', function () {
         $('#emojisDiv').collapse('hide');
+        $('#linkDiv').collapse('hide');
     });
     $('#emojisDiv').on('show.bs.collapse', function () {
         $('#pictureDiv').collapse('hide');
+        $('#linkDiv').collapse('hide');
+    });
+    $('#linkDiv').on('show.bs.collapse', function () {
+        $('#pictureDiv').collapse('hide');
+        $('#emojisDiv').collapse('hide');
+    });
+    $('#uploadFileButton').click(function () {
+        $('#pictureDiv').collapse('hide');
+        $("#previewImage").attr("src", "");
+        $('#uploadFileButton').addClass("invisible");
     });
 
     $.getJSON('../../static/json/emojis.json', function(data) {         
@@ -72,8 +113,8 @@ $(document).ready(function() {
                     "</td></tr>";
         $('#' + category + '-table').append(row);
         $('#emojis-tab').append(
-            "<li class=\"nav-item\">" +
-            "<a class=\"nav-link active\" id=\"" + category + "-tab\" href=\"#" + category + "\" role=\"tab\" aria-controls=\"" + category + "\" data-toggle=\"pill\" >" + category + "</a>" +
+            "<li class=\"nav-item shadow-sm mr-2\">" +
+            "<a class=\"nav-link bg-light text-secondary active show\" id=\"" + category + "-tab\" href=\"#" + category + "\" role=\"tab\" aria-controls=\"" + category + "\" data-toggle=\"pill\" aria-selected=\"true\">" + category + "</a>" +
             "</li>"
         );
 
@@ -85,8 +126,8 @@ $(document).ready(function() {
                 category = value.category;
                 row = "<tr>";
                 $('#emojis-tab').append(
-                    "<li class=\"nav-item\">" +
-                    "<a class=\"nav-link\" id=\"" + category + "-tab\" href=\"#" + category + "\" role=\"tab\" aria-controls=\"" + category + "\" data-toggle=\"pill\" >" + category + "</a>" +
+                    "<li class=\"nav-item shadow-sm mr-2\">" +
+                    "<a class=\"nav-link bg-light text-secondary\" id=\"" + category + "-tab\" href=\"#" + category + "\" role=\"tab\" aria-controls=\"" + category + "\" data-toggle=\"pill\" >" + category + "</a>" +
                     "</li>"
                 );
                 $('#emojis-tabContent').append(
@@ -116,37 +157,43 @@ $(document).ready(function() {
         document.getElementById('news-input').focus(); pasteHtmlAtCaret("<img src=\"" + $(this).attr('value') + "\">");
     });
 
-    // $('#uploadFileButton').click(function() {
-        $("#uploadForm").submit(function(event){
-            // alert("HO HO HO");
-            event.preventDefault(); //prevent default action 
-            var post_url = $(this).attr("action"); //get form action url
-            var request_method = $(this).attr("method"); //get form GET/POST method
-            // var form_data = $(this).serialize(); //Encode form elements for submission
-            var form_data = new FormData($(this)[0]);
-            $.ajax({
-                url : post_url,
-                type: request_method,
-                data : form_data,
-                async: false,
-                cache: false,
-                contentType: false,
-                processData: false
-            }).done(function(response){ 
-                // alert("HA HA HA");
-                // $("#output").html(response.uploadedFile);
-                document.getElementById('news-input').focus(); pasteHtmlAtCaret("<img src=\"" + "file://" + response.uploadedFile + "\">");
+    $("#uploadForm").submit(function(event){
+        event.preventDefault(); //prevent default action 
+        var post_url = $(this).attr("action"); //get form action url
+        var request_method = $(this).attr("method"); //get form GET/POST method
+        var form_data = new FormData($(this)[0]);
+        $.ajax({
+            url : post_url,
+            type: request_method,
+            data : form_data,
+            async: false,
+            cache: false,
+            contentType: false,
+            processData: false
+        }).done(function(response){ 
+            document.getElementById('news-input').focus(); pasteHtmlAtCaret("<img class=\"img-fluid\" src=\"" + response.uploadedFile + "\">");
+            document.getElementById('news-input').focus(); pasteHtmlAtCaret("<div>&nbsp;</div>");
+            $('#news-input img').on('load', function() {
+                autoExpand(document.getElementById('news-input'));
             });
         });
-    // });  
+    });
+
+    $("#linkForm").submit(function(event){
+        event.preventDefault();
+        var linkUrl = $('#inputAdress').val();
+        var linkText = $('#inputText').val();
+        document.getElementById('news-input').focus(); pasteHtmlAtCaret("<a href=\"" + linkUrl + "\">" + linkText + "</a>");
+        $('#linkDiv').collapse('hide');
+    });
 });
 
 function showpreview(e) {
     var reader = new FileReader();
     reader.onload = function (e) {
         $("#previewImage").attr("src", e.target.result);
+        $('#uploadFileButton').removeClass("invisible");
     }
-    //Imagepath.files[0] is blob type
     reader.readAsDataURL(e.files[0]);
 }
 

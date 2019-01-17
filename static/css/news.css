@@ -4,9 +4,16 @@
 	width: 100%;
 }
 .news-input:empty:not(:focus):before {
-    content: attr(data-placeholder)
-  }
+  content: attr(data-placeholder)
+}
 
-  .input-option {
-    border-radius: 15px 15px;
-  }
+.input-option {
+  border-radius: 15px 15px;
+}
+
+.input-group-prepend .input-group-text {
+  width: 80px;
+}
+/* #selectNewsTypeLabel {
+  white-space: nowrap;
+} */

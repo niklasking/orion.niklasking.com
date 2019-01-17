@@ -1,66 +1,164 @@
 <% include ../partials/header %>
 <link rel="stylesheet" href="/static/css/news.css">
 <script src="/static/js/news.js"></script>
+<script>
+    $(function() {
+        $('#datetimepickerValidTo').datetimepicker({
+            format:'Y.m.d H:i',
+            lang:'sv',
+            step: 30
+        });
+        $('#datetimepickerValidToIcon').click(function(){
+            $('#datetimepickerValidTo').datetimepicker('show'); //support hide,show and destroy command
+        });
+    });
+    $(function() {
+        $('#datetimepickerValidFrom').datetimepicker({
+            format:'Y.m.d H:i',
+            lang:'sv',
+            step: 30
+        });
+        $('#datetimepickerValidFromIcon').click(function(){
+            $('#datetimepickerValidFrom').datetimepicker('show'); //support hide,show and destroy command
+        });
+    });
+</script>
+
 <div class="container">
     <h1>Skapa en Nyhet</h1>
     <!-- <form action=""> -->
-        <div class="input-group">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Rubrik</span>
-            </div>
-            <!-- <input type="text" id="rubrik" class="form-control" placeholder="Rubrik" value="<%= uploadedFile %>"> -->
-            <input type="text" id="rubrik" class="form-control" placeholder="Rubrik">
+    <label class="d-md-none" for="rubrik">Rubrik</label>
+    <div class="input-group">
+        <div class="input-group-prepend d-none d-md-block">
+            <span class="input-group-text">Rubrik</span>
         </div>
-        <div class="input-group mt-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Nyhet&nbsp;</span>
-            </div>
-            <div id="news-input" class="form-control news-input text-secondary" data-placeholder="Vad har hänt, eller vad ska hända?" contenteditable="true">
-                <!-- <%= newsContent %> -->
-            </div>
+        <input type="text" id="rubrik" class="form-control" placeholder="Rubrik">
+    </div>
+    <label class="d-md-none mt-2" for="news-input">Nyhet</label>
+    <div class="input-group mt-md-3">
+        <div class="input-group-prepend d-none d-md-flex">
+            <span class="input-group-text">Nyhet</span>
         </div>
-        <div class="row mt-3 mx-1 border rounded">
-            <div class="col-2 d-flex align-items-center">
-                <!-- <a class="text-secondary" data-toggle="collapse" role="button" data-target="#emojisDiv" aria-expanded="false" aria-controls="emojisDiv">Lägg till i nyheten ...</a> -->
-                Lägg till i nyheten ...
+        <div id="news-input" class="form-control news-input text-secondary" data-placeholder="Vad har hänt, eller vad ska hända?" contenteditable="true">
+            <!-- <%= newsContent %> -->
+        </div>
+    </div>
+    <label class="d-lg-none mt-2">Lägg till i nyheten...</label>
+    <div class="mt-lg-3 border rounded form-group">
+        <div class="row">
+            <div class="col-2 align-items-center pl-4 d-none d-lg-flex">
+                Lägg till i nyheten...
             </div>
             <div class="col my-1">
                 <a class="input-option btn bg-light text-secondary" data-toggle="collapse" role="button" data-target="#emojisDiv" aria-expanded="false" aria-controls="emojisDiv">😀 Känsla/aktivitet/klubb</a>
-                <a class="input-option btn bg-light text-secondary ml-3" data-toggle="collapse" role="button" data-target="#pictureDiv" aria-expanded="false" aria-controls="pictureDiv">
+                <a class="input-option btn bg-light text-secondary ml-2" data-toggle="collapse" role="button" data-target="#pictureDiv" aria-expanded="false" aria-controls="pictureDiv">
                     <img src="/static/imgs/facebook_images.png" height="20px" alt=""> Bild
                 </a>
-                <a class="input-option btn bg-light text-secondary ml-3" data-toggle="collapse" role="button" data-target="#emojisDiv" aria-expanded="false" aria-controls="emojisDiv">
+                <a class="input-option btn bg-light text-secondary ml-2" data-toggle="collapse" role="button" data-target="#linkDiv" aria-expanded="false" aria-controls="linkDiv">
                     <img src="/static/imgs/link.png" height="20px" alt=""> Länk
                 </a>
             </div>
         </div>
-        <div id="emojisDiv" class="collapse mt-3 mx-1">
-            <ul class="nav nav-pills mb-3" id="emojis-tab" role="tablist"></ul>
-            <div class="tab-content" id="emojis-tabContent"></div>
-            <div id="emojs">
-                <table id="emoji-table"></table>
-            </div>
+    </div>
+
+    <!-- *********    LÄGG TILL - START ************ -->
+
+    <div id="emojisDiv" class="collapse mt-3 mx-1">
+        <ul class="nav nav-pills mb-3" id="emojis-tab" role="tablist"></ul>
+        <div class="tab-content" id="emojis-tabContent"></div>
+        <div id="emojs">
+            <table id="emoji-table"></table>
         </div>
-        <div id="pictureDiv" class="collapse mt-3 mx-1">
-            <h3>Infoga bild</h3>
-            <h4>Leta efter en gammal bild</h4>
+    </div>
+    <div id="pictureDiv" class="collapse mt-3 mx-1">
+        <h4>Infoga bild</h4>
+        <form action="/news/img/upload" id="uploadForm" enctype="multipart/form-data" method="POST">
             <div class="custom-file">
-                <input type="file" class="custom-file-input" id="existingFile">
-                <label class="custom-file-label" for="existingFile">Choose file</label>
+                <input type="file" class="custom-file-input" id="uploadFile" name="upload" onchange='showpreview(this)'>
+                <label class="custom-file-label" for="uploadFile">Ladda upp en bild</label>
             </div>
-            <hr>
-            <form action="/news/img/upload" id="uploadForm" enctype="multipart/form-data" method="POST">
-            <!-- <form action="/news/img/upload" id="uploadForm" method="POST"> -->
-                <input type="file" name="upload" onchange='showpreview(this)'>
-                <!-- <input type="hidden" id="newsContent" name="newsContent"> -->
-                <input type="submit" id="uploadFileButton" value="Upload">
-            </form>
-            <img width="50%" id="previewImage">
+            <img id="previewImage" class="mt-2" style="max-width: 300px;">
+            <div>
+                <input class="btn btn-primary invisible mt-2" type="submit" id="uploadFileButton" value="Infoga bild">
+            </div>
+        </form>
+    </div>
+    <div id="linkDiv" class="collapse mt-3 mx-1">
+        <h4>Infoga en länk</h4>
+        <form id="linkForm">
+            <div class="form-group">
+              <label for="inputAdress">Adress</label>
+              <input type="text" class="form-control" id="  " placeholder="http://" required>
+            </div>
+            <div class="form-group">
+                <label for="inputText">Text</label>
+                <input type="text" class="form-control" id="inputText" placeholder="Text för länken" required>
+            </div>
+            <div class="form-group">
+                <button class="form-control btn btn-primary" id="addLinkButton">Infoga länk</button>
+            </div>
+          </form>
+    </div>
+
+    <!-- *********    LÄGG TILL - END ************ -->
+
+    <!-- <label class="d-md-none mt-2">Typ av nyhet</label> -->
+    <div class="mt-3 border rounded form-group">
+        <div class="row">
+            <!-- <div class="col-2 align-items-center pl-4 d-flex" id="selectNewsTypeLabel"> -->
+            <div class="col-4 col-md-3 col-lg-2 align-items-center pl-4 d-flex">
+                Typ av nyhet
+            </div>
+            <div class="col my-1">
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="nyhetKlubb" checked>
+                    <label class="custom-control-label" for="nyhetKlubb">Klubbnyhet</label>
+                </div>
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="nyhetElit">
+                    <label class="custom-control-label" for="nyhetElit">Elitsidan</label>
+                </div>
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="nyhetUngdon">
+                    <label class="custom-control-label" for="nyhetUngdon">Ungdomssidan</label>
+                </div>
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="nyhetFacebook" disabled>
+                    <label class="custom-control-label" for="nyhetFacebook">Facebook</label>
+                </div>
+            </div>
         </div>
-            </div>
-        <hr>
-        <button class="btn btn-primary" id="add-emoji">Spara nyhet</button>
-    <!-- </form> -->
-    <div class="border my-3" id="output"></div>
+    </div>
+
+
+    <div class="form-group mt-3">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Visas till</span>
+                </div>
+                <input class="form-control" id="datetimepickerValidTo" type="text" placeholder="Visas till..." name="validTo">
+                <div class="input-group-apppend">
+                    <div class="input-group-text" id="datetimepickerValidToIcon"><span style="font-size: 1.5em;"><i class="fas fa-calendar-day"></i></span></div>
+                </div>
+            </div>                            
+        </div>
+        <div class="form-group mt-3">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Visas från</span>
+                </div>
+                <input class="form-control" id="datetimepickerValidFrom" type="text" placeholder="Aktiveras" name="validFrom">
+                <div class="input-group-apppend">
+                    <div class="input-group-text" id="datetimepickerValidFromIcon"><span style="font-size: 1.5em;"><i class="fas fa-calendar-day"></i></span></div>
+                </div>
+            </div>                            
+        </div>
+    
+    <div class="row">
+        <div class="col">
+            <button class="btn btn-lg btn-primary float-right mr-3 mt-3" id="add-emoji">Spara nyhet</button>            
+        </div>
+    </div>
+    <div class="my-3 p-3" id="output"></div>
 </div>
 <% include ../partials/footer %>

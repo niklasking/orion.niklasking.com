@@ -2,34 +2,32 @@ var express         = require('express');
 var router          = express.Router();
 var passport        = require('passport');
 var request         = require('request');
-var formidable      = require('formidable');
+// var formidable      = require('formidable');
 var fs              = require('fs');
 var util            = require('util');
-var os = require('os');
+var multer          = require('multer');
+
+var upload = multer({ dest: './uploads/' });
 // var News            = require('../models/News');
 
 router.get("/news/new", function(req, res) {
     res.render("news/new", {uploadedFile: "", newsContent: ""});
 });
 
-router.post("/news/img/upload", function(req, res) {
-    var form = new formidable.IncomingForm();
- 
-    form.parse(req, function (err, fields, files) {
-        // var uploadedFile = files.upload.path + "/" + files.upload.name;
-        var uploadedFile = files.upload.path;
-        // var oldpath = files[0].path;
-        // var newpath = '/uploads/' + files[0].name;
-        // fs.rename(oldpath, newpath, function (err) {
-        // if (err) throw err;
-        //     res.write('File uploaded and moved!');
-        //     res.end();
-        // });
-        // res.write('File uploaded');
-        // res.end();
-        res.send({uploadedFile: uploadedFile});
-        // res.render("news/new", {uploadedFile: uploadedFile, newsContent: fields.newsContent});
-    });
+router.post("/news/img/upload", upload.single("upload"), function(req, res) {
+    if (req.file) {
+        var oldpath = __dirname + "/../" + req.file.path;
+        var newpath = __dirname + "/../static/imgs/uploaded/" + req.file.originalname;
+        fs.renameSync(oldpath, newpath, function (err) {
+            if (err) throw err;
+        });
+        var uploadedFile = "/static/imgs/uploaded/" + req.file.originalname;
+    } else {
+        console.log('No File Uploaded');
+        var uploadedFile = "";
+        var uploadStatus = 'File Upload Failed';
+    }
+    res.send({uploadedFile: uploadedFile});
 });
 
 module.exports = router;
