@@ -118,25 +118,37 @@ $(document).ready(function() {
 
     // $('#uploadFileButton').click(function() {
         $("#uploadForm").submit(function(event){
+            // alert("HO HO HO");
             event.preventDefault(); //prevent default action 
             var post_url = $(this).attr("action"); //get form action url
             var request_method = $(this).attr("method"); //get form GET/POST method
-            var form_data = $(this).serialize(); //Encode form elements for submission
-            
+            // var form_data = $(this).serialize(); //Encode form elements for submission
+            var form_data = new FormData($(this)[0]);
             $.ajax({
                 url : post_url,
-                // type: "POST",
                 type: request_method,
-                // method: request_method,
-                data : form_data
+                data : form_data,
+                async: false,
+                cache: false,
+                contentType: false,
+                processData: false
             }).done(function(response){ 
-                alert("HA HA HA");
-                $("#output").html(response);
+                // alert("HA HA HA");
+                // $("#output").html(response.uploadedFile);
+                document.getElementById('news-input').focus(); pasteHtmlAtCaret("<img src=\"" + "file://" + response.uploadedFile + "\">");
             });
         });
     // });  
-
 });
+
+function showpreview(e) {
+    var reader = new FileReader();
+    reader.onload = function (e) {
+        $("#previewImage").attr("src", e.target.result);
+    }
+    //Imagepath.files[0] is blob type
+    reader.readAsDataURL(e.files[0]);
+}
 
 function pasteHtmlAtCaret(html) {
     var sel, range;

@@ -16,9 +16,8 @@ router.post("/news/img/upload", function(req, res) {
     var form = new formidable.IncomingForm();
  
     form.parse(req, function (err, fields, files) {
-        // console.log(fields);
-        // console.log("*************");
-        var uploadedFile = files.upload.path + "/" + files.upload.name;
+        // var uploadedFile = files.upload.path + "/" + files.upload.name;
+        var uploadedFile = files.upload.path;
         // var oldpath = files[0].path;
         // var newpath = '/uploads/' + files[0].name;
         // fs.rename(oldpath, newpath, function (err) {
@@ -28,7 +27,7 @@ router.post("/news/img/upload", function(req, res) {
         // });
         // res.write('File uploaded');
         // res.end();
-        res.send({uploadedFile: uploadedFile, newsContent: fields.newsContent});
+        res.send({uploadedFile: uploadedFile});
         // res.render("news/new", {uploadedFile: uploadedFile, newsContent: fields.newsContent});
     });
 });

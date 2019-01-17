@@ -51,11 +51,13 @@
             <hr>
             <form action="/news/img/upload" id="uploadForm" enctype="multipart/form-data" method="POST">
             <!-- <form action="/news/img/upload" id="uploadForm" method="POST"> -->
-                <input type="file" name="upload" multiple>
-                <input type="hidden" id="newsContent" name="newsContent">
+                <input type="file" name="upload" onchange='showpreview(this)'>
+                <!-- <input type="hidden" id="newsContent" name="newsContent"> -->
                 <input type="submit" id="uploadFileButton" value="Upload">
             </form>
+            <img width="50%" id="previewImage">
         </div>
+            </div>
         <hr>
         <button class="btn btn-primary" id="add-emoji">Spara nyhet</button>
     <!-- </form> -->
