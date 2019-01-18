@@ -21,11 +21,51 @@ var autoExpand = function (field) {
     field.style.height = height + 'px';
 };
 $(document).ready(function() {
+    $('#uploadFileButton').hide();
+    $('#previewOldImages').hide();
     var now = new Date();
     var endDate = moment(now).add(14, 'days').format('YYYY-MM-DD HH:mm:ss');
     $('#datetimepickerValidTo').val(endDate);
     var startDate = moment(now).format('YYYY-MM-DD HH:mm:ss');
     $('#datetimepickerValidFrom').val(startDate);
+
+
+    $('#showOldFiles').click(function() {
+        $('#previewOldImages').show();
+        $('#showOldFiles').show();
+        $('#uploadFileButton').hide();
+        $('#previewImage').hide();
+        $.ajax({
+            url : "/news/imgs/old",
+            type: "GET",
+            data : "",
+            async: false,
+            cache: false,
+            contentType: false,
+            processData: false
+        }).done(function(response){ 
+            $('#previewOldImages').empty();
+            response.oldImages.forEach(function(img) {
+                var oldImageDiv = $('<div class="col-2">');
+                var oldImage = $('<img class="img-fluid">');
+                oldImage.attr('src', img);
+                oldImage.appendTo(oldImageDiv);
+                oldImageDiv.appendTo($('#previewOldImages'));
+                oldImage.click(function() {
+                    // var srcParts = ($(this).attr("src")).split('/');
+                    // var src = "/static/imgs/uploaded/src/" + srcParts[5];
+                    
+                    var src = $(this).attr("src").replace("thumbnail_small", "src");
+                    showpreviewOld(src);
+                });
+            });
+            $('#showOldFiles').hide();
+        });
+    });
+
+    // $("#previewOldImages").click(function () {
+	// 	alert('Img btn clicked');
+	// });
 
 
     $('#add-emoji').click(function() {
@@ -58,6 +98,7 @@ $(document).ready(function() {
     $('#pictureDiv').on('show.bs.collapse', function () {
         $('#emojisDiv').collapse('hide');
         $('#linkDiv').collapse('hide');
+        $('#previewOldImages').empty();
     });
     $('#emojisDiv').on('show.bs.collapse', function () {
         $('#pictureDiv').collapse('hide');
@@ -70,7 +111,7 @@ $(document).ready(function() {
     $('#uploadFileButton').click(function () {
         $('#pictureDiv').collapse('hide');
         $("#previewImage").attr("src", "");
-        $('#uploadFileButton').addClass("invisible");
+        $('#uploadFileButton').hide();
     });
 
     $.getJSON('../../static/json/emojis.json', function(data) {         
@@ -157,6 +198,10 @@ $(document).ready(function() {
         document.getElementById('news-input').focus(); pasteHtmlAtCaret("<img src=\"" + $(this).attr('value') + "\">");
     });
 
+
+
+
+
     $("#uploadForm").submit(function(event){
         event.preventDefault(); //prevent default action 
         var post_url = $(this).attr("action"); //get form action url
@@ -188,13 +233,24 @@ $(document).ready(function() {
     });
 });
 
+
 function showpreview(e) {
     var reader = new FileReader();
     reader.onload = function (e) {
         $("#previewImage").attr("src", e.target.result);
-        $('#uploadFileButton').removeClass("invisible");
+        $('#showOldFiles').show();
+        $('#previewOldImages').hide();
+        $('#uploadFileButton').show();
+        $('#previewImage').show();    
     }
     reader.readAsDataURL(e.files[0]);
+}
+function showpreviewOld(src) {
+    $("#previewImage").attr("src", src);
+    $('#showOldFiles').show();
+    $('#previewOldImages').hide();
+    $('#uploadFileButton').show();
+    $('#previewImage').show();    
 }
 
 function pasteHtmlAtCaret(html) {
