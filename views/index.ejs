@@ -99,7 +99,7 @@
     <div class="row">
         <div class="col-md-4">
             <h1>Senaste Nytt</h1>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Nemo soluta obcaecati necessitatibus esse, at fuga laborum pariatur perferendis commodi, quidem dolorem repudiandae corporis beatae. Veritatis vel commodi odit quam unde?</p>
+            <div id="newsDiv"></div>
         </div>
         <div class="col-md-4">
             <h1>Träning</h1>
@@ -251,6 +251,29 @@
         success: function(data){
             data.rows.forEach(function(row) {
                 $("#compsTable tbody").append(row);
+            });
+        },
+        error: function(jqXHR, textStatus, err){
+            console.log('text status '+textStatus+', err '+err);
+        }
+    });
+</script>
+<script>
+    $.ajax({
+        url: "/news",
+        data: { client: "club" }, 
+        success: function(data){
+            data.news.forEach(function(oneNews) {
+                var eventInfo = "<div class=\"border rounded p-1\">";
+                eventInfo += "<h4>" + oneNews.rubrik + "</h4>";
+                // eventInfo += "<p class=\"my-0\"><small><em>" + oneNews.modified + "</em></small></p>";
+                eventInfo += "<div>" + oneNews.text + "</div>";
+                if (oneNews.documents != "") {
+                    eventInfo += "<p><small><em>" + moment(oneNews.modified).format("YYYY-MM-DD HH:mm") + ": " + oneNews.createdBy + "</em></small></p>";
+                    eventInfo += "<hr class=\"my-1\"><div class=\"d-flex align-items-center\"><ul class=\"mb-0\">" + oneNews.documents + "</ul></div>";
+                }
+                eventInfo += "</div>";
+                $("#newsDiv").append(eventInfo);
             });
         },
         error: function(jqXHR, textStatus, err){

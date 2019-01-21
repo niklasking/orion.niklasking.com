@@ -164,7 +164,7 @@ function getOrionEntries(events) {
                     }
                 });
             } else {
-                reject(err);
+                reject(error);
             }
         });
     });
