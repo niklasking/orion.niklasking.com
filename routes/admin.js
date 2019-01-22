@@ -702,6 +702,7 @@ router.delete("/admin/calendar/comps/:id", middleware.isLoggedIn, function(req,r
 router.post("/admin/calendar", middleware.isLoggedIn, function(req, res) {
     var title = decodeURIComponent(req.body.title);
     var start = req.body.start;
+    start = start.replace(/\./g, '-');
     var className = req.body.className;
     var link = req.body.link;
     var ansvarig = req.body.ansvarig;

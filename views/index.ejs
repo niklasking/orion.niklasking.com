@@ -2,6 +2,7 @@
 
 <script src='/static/js/fullcalendar_sv.js'></script>
 <link rel="stylesheet" href="/static/css/calendar.css">
+<!-- <link rel="stylesheet" href="/static/css/home.css"> -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin="">
 <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js" integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg==" crossorigin=""></script>
 
@@ -28,7 +29,11 @@
                 // location.replace("/calendar:" + calEvent._id);
                 // alert('Event: ' + calEvent._id);
                 $("#modal-title").text(calEvent.title);
-                $('#time-and-date').text(moment(calEvent.start).format("YYYY-MM-DD HH:mm"));
+                // if (calEvent.start.indexOf('-') != -1) {
+                    $('#time-and-date').text(moment(calEvent.start).format("YYYY-MM-DD HH:mm"));
+                // } else {
+                //     $('#time-and-date').text(moment(calEvent.start).format("YYYY.MM.DD HH:mm"));
+                // }
                 $('#description').html(calEvent.description);
                 $('#responsible').text(calEvent.ansvarig);
                 if (calEvent.link != undefined && calEvent.link.length > 0) {
@@ -264,12 +269,12 @@
         data: { client: "club" }, 
         success: function(data){
             data.news.forEach(function(oneNews) {
-                var eventInfo = "<div class=\"border rounded p-1\">";
+                var eventInfo = "<div class=\"border rounded p-1 mt-1\">";
                 eventInfo += "<h4>" + oneNews.rubrik + "</h4>";
                 // eventInfo += "<p class=\"my-0\"><small><em>" + oneNews.modified + "</em></small></p>";
                 eventInfo += "<div>" + oneNews.text + "</div>";
+                eventInfo += "<p class=\"mb-0\"><small><em>" + moment(oneNews.modified).format("YYYY-MM-DD HH:mm") + ": " + oneNews.createdBy + "</em></small></p>";
                 if (oneNews.documents != "") {
-                    eventInfo += "<p><small><em>" + moment(oneNews.modified).format("YYYY-MM-DD HH:mm") + ": " + oneNews.createdBy + "</em></small></p>";
                     eventInfo += "<hr class=\"my-1\"><div class=\"d-flex align-items-center\"><ul class=\"mb-0\">" + oneNews.documents + "</ul></div>";
                 }
                 eventInfo += "</div>";

@@ -42,6 +42,7 @@ router.get("/calendar", function(req, res) {
             console.log(err);
         }
         else {
+            // console.log(events);
             res.render("calendar/calendar", {event_list: events});
         }
     });    
@@ -68,8 +69,10 @@ router.get("/calendar/comp/fetch", function(req, res) {
             if(err) {
                 console.log(err);
                 res.send(rows);
-            }
-            else {
+            } else if (events == undefined || events.length == 0) {
+                console.log("Hittade inga tävlingar");
+                res.send(rows);
+            } else {
                 var entries = [];
                 var entriesPromise = getOrionEntries(events);
                 entriesPromise.then(function(result) {
