@@ -1,2 +1,3 @@
 node_modules/
-static/imgs/uploaded/*
+static/imgs/uploaded/src/*
+static/imgs/uploaded/thumbnail_small/*
