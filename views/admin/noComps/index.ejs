@@ -1,0 +1,217 @@
+<% include ../../partials/header %>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin="">
+<script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js" integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg==" crossorigin=""></script>
+<link rel="stylesheet" href="/static/css/comps.css">
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col">
+            <h1>Tävlingar som inte räknas <%= year %></h1>
+        </div>
+    </div>
+    <% for (var i = 0; i < comps.length; i++) { %>
+        <div class="row my-0">
+            <div class="col-2 align-self-center">
+                <span><%= comps[i].date.toString().substring(0, 10) %></span>
+            </div>
+            <div class="col align-self-center">
+                    <img src="https://eventor.orientering.se/Organisation/Logotype/<%= comps[i].orgId %>?type=SmallIcon"> <span><%= comps[i].name %></span>
+            </div>
+            <div class="col-2">
+                <form action="/admin/noComps/<%= comps[i]._id %>/?_method=DELETE" method="POST">
+                    <input type="hidden" name="year" value="<%= year %>">
+                    <input type="submit" class="btn btn-sm btn-danger" value="Ta bort">
+                </form>
+            </div>
+        </div>
+    <% } %>
+    <div class="row">
+        <div class="col">
+            <hr>
+            <h1>Lägg till en tävling som inte ska räknas <%= year %></h1>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col">
+            <form>
+                <div class="form-row align-items-center">
+                    <div class="col-auto">
+                            <label for="eventorId">Ange tävlingens Eventor id:</label>
+                    </div>
+                    <div class="col-auto">
+                        <input type="text" class="form-control" id="eventorId" name="eventorId" aria-describedby="eventorIdHelp" placeholder="Eventor id">
+                    </div>
+                    <div class="col-auto">
+                            <input class="btn btn-primary" id="enter" value="Hämta">
+                            <span id="errorMessage" style="color:red;" class="ml-2"></span>    
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row infoRow hide">
+        <div class="col-2">
+            <strong>Datum: </strong>
+        </div>
+        <div class="col-10">
+            <span id="start"></span>
+        </div>
+    </div>
+    <div class="row infoRow hide">
+        <div class="col-2">
+            <strong>Namn: </strong>
+        </div>
+        <div class="col-10">
+            <span id="title"></span>
+        </div>
+    </div>
+    <div class="row infoRow hide">
+        <div class="col-2">
+            <strong>Arrangör: </strong>
+        </div>
+        <div class="col-10">
+            <span id="ansvarig"></span>
+        </div>
+    </div>
+    <div class="row infoRow hide">
+        <div class="col-2">
+            <strong>Typ: </strong>
+        </div>
+        <div class="col-10">
+            <span id="raceType"></span>
+        </div>
+    </div>
+    <div class="row infoRow hide">
+        <div class="col-2">
+            <strong>Distans: </strong>
+        </div>
+        <div class="col-10">
+            <span id="raceDistance"></span>
+        </div>
+    </div>
+    <div class="row justify-content-center infoRow hide my-3">
+        <div class="col">
+            <div id="mapid" style="height: 250px;"></div>
+        </div>
+    </div>
+
+    <div class="row justify-content-left infoRow hide">
+        <form id="addForm" action="/admin/noComps/" method="POST" class="container-fluid">
+            <input type="hidden" name="eventorId" id="eventorIdInput">
+            <input type="hidden" name="orgId" id="orgIdInput">
+            <input type="hidden" name="start" id="startInput">
+            <input type="hidden" name="title" id="titleInput">
+            <input type="hidden" name="ansvarig" id="ansvarigInput">
+            <input type="hidden" name="lat" id="latInput">
+            <input type="hidden" name="lng" id="lngInput">
+            <input type="hidden" name="raceType" id="raceTypeInput">
+            <input type="hidden" name="raceDistance" id="raceDistanceInput">
+
+            <input class="btn btn-primary" type="submit" value="Lägg till tävling">
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">            
+    $('#enter').click(function(){  
+        var eventorId = $('#eventorId').val();
+        if (eventorId != "") {
+            $('#errorMessage').text("");
+            $.ajax({
+                url: "/admin/calendar/comps/fetch",
+                data: { eventorId: eventorId }, 
+                success: function(data){
+                    $('.hide').removeClass('hide');
+                    if (data.events.length == 0) {
+                        $('#errorMessage').text("Kunde inte hitta " + $('#eventorId').val());
+                        $('#start').text("");
+                        $('#title').text("");
+                        $('#ansvarig').text("");
+                        $('#raceType').text("");
+                        $('#raceDistance').text("");
+                        $('.infoRow').hide();
+                    } else {
+                        if (data.events.length > 0 && data.events[0].start != "") {
+                            var i = 0;
+                            var type = ((data.events[i].raceType == "RelaySingleDay" || data.events[i].raceType == "RelayMultiDay") ? "Stafett" : ((data.events[i].raceType == "IndMultiDay") ? "Flerdagars" : "Individuellt"));
+                            type = type + (data.events[i].raceNight ? " natt" : "");
+                            var distans = "Lång";
+                            switch (data.events[i].raceDistance) {
+                                case "Middle":
+                                    distans = "Medel";
+                                    break;
+                                case "UltraLong":
+                                    distans = "Ultralång";
+                                    break;
+                                case "Sprint":
+                                    distans = "Sprint";
+                                    break;
+                            }
+                            $('#start').text(data.events[0].start);
+                            $('#title').text(data.events[0].title);
+                            $('#ansvarig').text(data.events[0].ansvarig);
+                            $('#raceType').text(type);
+                            $('#raceDistance').text(distans);
+                            $('.infoRow').show();
+
+                            $('#legs').val("1");
+                            $('#eventorIdInput').val(data.events[0].eventorId);
+                            $('#orgIdInput').val(data.events[i].orgId);
+                            $('#startInput').val(data.events[0].start);
+                            $('#titleInput').val(data.events[0].title);
+                            $('#ansvarigInput').val(data.events[0].ansvarig);
+                            $('#latInput').val(data.events[0].lat);
+                            $('#lngInput').val(data.events[0].lng);
+                            $('#raceTypeInput').val(type);
+                            $('#raceDistanceInput').val(distans);
+                            renderMap(data.events[0], 1);
+                        }
+                    }
+                },
+                error: function(jqXHR, textStatus, err){
+                    console.log('text status '+textStatus+', err '+err);
+                }
+            });
+        } else {
+            $('#errorMessage').text("Du måste ange ett Eventor id.");
+            $('.infoRow').hide();
+        }
+    });            
+</script>
+<script>
+    var mymap;
+    var marker;
+</script>
+<script>
+    function renderMap(event, pos) {
+        var lat = event.lat;
+        var lng = event.lng;
+
+
+        if (pos == 1) {
+            if (mymap == undefined) {
+                mymap = L.map('mapid').setView([lat, lng], 11);
+                L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+                    maxZoom: 18,
+                    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+                        '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                        'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                    id: 'mapbox.streets'
+                }).addTo(mymap);
+            } else {
+                mymap.setView([lat, lng], 11);
+            }
+
+            if (lat != undefined && lng != undefined) {
+                if (marker != undefined) { // check
+                    mymap.removeLayer(marker); // remove
+                }
+                marker = new L.Marker([lat, lng]);
+                marker.addTo(mymap);
+            }
+        }
+    }
+</script>
+
+<% include ../../partials/footer %>

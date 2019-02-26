@@ -49,7 +49,7 @@ function checkRole(requiredRole, req, res, next) {
             }
         });  
     } else {
-        req.flash("error", "Please login first.");
+        req.flash("error", "Vänligen logga in först.");
         res.redirect("/login");
     }
 }

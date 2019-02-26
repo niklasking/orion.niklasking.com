@@ -1,14 +1,15 @@
-var express         = require('express'),
-    request         = require('request'),
-    parseXMLString  = require('xml2js').parseString,
-    router          = express.Router(),
-    moment          = require('moment'),
-    passport        = require('passport'),
-    Runner          = require('../models/runner'),
-    Competition     = require('../models/competition'),
-    CalendarEvent   = require('../models/calendarEvent'),
-    User            = require('../models/user'),
-    middleware      = require("../middleware");
+var express             = require('express'),
+    request             = require('request'),
+    parseXMLString      = require('xml2js').parseString,
+    router              = express.Router(),
+    moment              = require('moment'),
+    passport            = require('passport'),
+    Runner              = require('../models/runner'),
+    Competition         = require('../models/competition'),
+    CalendarEvent       = require('../models/calendarEvent'),
+    NoCalcCompetition   = require('../models/noCalcCompetition'),
+    User                = require('../models/user'),
+    middleware          = require("../middleware");
 
 var ORINGEN_ELITSPRINT = 24317;
 var API_KEY = "a7ff03d951bf4584a848df74aca6768d";
@@ -17,6 +18,7 @@ router.get("/admin", middleware.isLoggedIn, function(req, res) {
     var superAdmin = "no";
     User.find({eventorId: req.user.eventorId}, function(err, users) {
         if(err) {
+            console.log("error: " + err);
         }
         else {
             if (users.length > 0) {
@@ -26,8 +28,8 @@ router.get("/admin", middleware.isLoggedIn, function(req, res) {
                         break;
                     }
                 }
-                res.render("admin/index", {superAdmin: superAdmin});
             }
+            res.render("admin/index", {superAdmin: superAdmin});
         }
     });   
 });
@@ -190,26 +192,42 @@ router.get("/admin/runners/refresh/:year", middleware.isSuperAdmin, function(req
         }
     };
     var data; // Used to transfer info between promises.
+    var noCalcCompetitions; // Used to transfer info between promises.
 
     var app = req.app;
     req.app.io.sockets.emit('refresh status', "Nu börjar vi!");
     
-    
-
-    // Get members from Eventor
-    var dataPromise = new Promise(function(resolve, reject) {
-        request(options, function(error, response, body) {
-            if (error || response.statusCode != 200) {
-                req.flash("error", "Nu blev det knas i steg 1 :-(");
-                console.log("error 1");
-                req.app.io.sockets.emit('refresh status', "ERROR: Nu blev det knas i steg 1.");
-                reject(error);
-            } else {
-                console.log("ok 1");
-                req.app.io.sockets.emit('refresh status', "Alla medlemmar hämtade från Eventor för " + year);
-                data = body;
-                resolve(data);
+    // Get competitions not to be calculated
+    var query = NoCalcCompetition.
+                find({ resultYear: year });
+    var noCalcPromise = new Promise(function(resolve, reject) {
+        query.exec(function(err, comps) { 
+            if(err) {
+                req.app.io.sockets.emit('refresh status', "ERROR: Kunde inte hämta ej räkningsbara tävlingar, " + err);
+                reject(err);
             }
+            else {
+                noCalcCompetitions = comps;
+                resolve(noCalcCompetitions);
+            }
+        });  
+    }).then(function(result) {
+    // Get members from Eventor
+    // var dataPromise = new Promise(function(resolve, reject) {
+        return new Promise((resolve, reject) => {
+            request(options, function(error, response, body) {
+                if (error || response.statusCode != 200) {
+                    req.flash("error", "Nu blev det knas i steg 1 :-(");
+                    console.log("error 1");
+                    req.app.io.sockets.emit('refresh status', "ERROR: Nu blev det knas i steg 1.");
+                    reject(error);
+                } else {
+                    console.log("ok 1");
+                    req.app.io.sockets.emit('refresh status', "Alla medlemmar hämtade från Eventor för " + year);
+                    data = body;
+                    resolve(data);
+                }
+            });
         });
     }).then(function(result) {
     // Remove all members in database
@@ -329,7 +347,7 @@ router.get("/admin/runners/refresh/:year", middleware.isSuperAdmin, function(req
                             var promises = [];
                             runners = data;
                             runners.forEach(function(runner) {
-                                promises.push(calculatePoints(runner, req.app.io));
+                                promises.push(calculatePoints(runner, req.app.io, noCalcCompetitions));
                                 // promises.push(calculatePoints(runner));
                             });
                             Promise.all(promises) 
@@ -504,6 +522,62 @@ router.get("/admin/calendar/comps/fetch", function (req, res){
                 else {
                     res.render("admin/comps/index", {comps: comps, year: year});
                 }
+    });
+});
+
+router.get("/admin/noComps/:year", middleware.isLoggedIn, function(req, res) {
+    var year = req.params.year;
+    NoCalcCompetition.find({resultYear: year}).
+            sort({start: 1}).
+            exec(function(err, comps) {
+                if(err) {
+                    req.flash("error", "Nu blev det nåt knas :-(");
+                    console.log(err);
+                    res.redirect("/");
+                }
+                else {
+                    res.render("admin/noComps/index", {comps: comps, year: year});
+                }
+    });
+});
+
+router.post("/admin/noComps", middleware.isLoggedIn, function(req, res) {
+    var newComp =new NoCalcCompetition({
+        eventorId: req.body.eventorId,
+        orgId: req.body.orgId,
+        date: req.body.start,
+        name: req.body.title,
+        ansvarig: req.body.ansvarig,
+        lat: req.body.lat,
+        lng: req.body.lng,
+        raceType: req.body.raceType,
+        raceDistance: req.body.raceDistance,
+        resultYear: req.body.start.toString().substring(0, 4)     
+   });
+   NoCalcCompetition.create(newComp, function(err, justCreatedComp) {
+    if(err) {
+        req.flash("error", "Nu blev det nåt knas :-(");
+        console.log(err);
+        res.redirect("/admin");
+    }
+    else {
+        // req.flash("success", "Successfully created a campground.");
+        req.flash("success", "Icke-tävling " + justCreatedComp.name + " sparad.");
+        res.redirect("/admin/noComps/" + justCreatedComp.resultYear);
+    }
+}); 
+
+});
+
+router.delete("/admin/noComps/:id", middleware.isLoggedIn, function(req,res) {
+    var year = req.body.year;
+    NoCalcCompetition.findByIdAndRemove(req.params.id, function(err) {
+        if (err) {
+            req.flash("error", "Det gick inte att ta bort tävlingen. Undrar varför?");
+            res.redirect("/admin/noComps/" + year);
+        }
+        req.flash("success", "Tävlingen borttagen.");
+        res.redirect("/admin/noComps/" + year);
     });
 });
 
@@ -825,7 +899,7 @@ function getAndSaveCompetitions(runner, body, year, io) {
             console.log(err);
         } else if (result.ResultListList.ResultList == undefined) {
         } else {
-            console.log("Found results for runner: " + runner.nameGiven + " " + runner.nameFamily);
+            // console.log("Found results for runner: " + runner.nameGiven + " " + runner.nameFamily);
             io.sockets.emit('refresh status', "Hittade resultat för " + year + " för " + runner.nameGiven + " " + runner.nameFamily);
             var competitionsArray = [];
             result.ResultListList.ResultList.forEach(function(comp) {
@@ -834,9 +908,10 @@ function getAndSaveCompetitions(runner, body, year, io) {
                 var date = comp.Event[0].StartDate[0].Date;
                 // var year = year;
                 var category = comp.Event[0].EventClassificationId;
-                var className = comp.ClassResult[0].EventClass[0].Name;
-                var classType = comp.ClassResult[0].EventClass[0].ClassTypeId;
-                var starts = parseInt(comp.ClassResult[0].EventClass[0].ClassRaceInfo[0].$.noOfStarts);
+                var className = comp.ClassResult[0].EventClass != undefined ? comp.ClassResult[0].EventClass[0].Name : "";
+                var classType = comp.ClassResult[0].EventClass != undefined ? comp.ClassResult[0].EventClass[0].ClassTypeId : "";
+                var starts = comp.ClassResult[0].EventClass[0].ClassRaceInfo[0].$ != undefined ?
+                             parseInt(comp.ClassResult[0].EventClass[0].ClassRaceInfo[0].$.noOfStarts) : 0;
 
                 var relay = comp.ClassResult[0].EventClass[0].$.teamEntry == "Y" ? true : false;
                 var statusOk = comp.Event[0].EventStatusId == "9" ? true : false;
@@ -887,7 +962,9 @@ function getAndSaveCompetitions(runner, body, year, io) {
                                 starts = starts = parseInt(comp.ClassResult[day].EventClass[0].ClassRaceInfo[0].$.noOfStarts);
                                 name = eventName + " " + comp.ClassResult[day].EventClass[0].Name;
                                 className = comp.ClassResult[day].EventClass[0].Name;
-                                date = comp.ClassResult[day].PersonResult[0].RaceResult[0].Result[0].StartTime[0].Date;
+                                if (comp.ClassResult[day].PersonResult[0].RaceResult[0].Result[0].StartTime != undefined) {
+                                    date = comp.ClassResult[day].PersonResult[0].RaceResult[0].Result[0].StartTime[0].Date;
+                                }
                                 resultOk = comp.ClassResult[day].PersonResult[0].RaceResult[0].Result[0].CompetitorStatus[0].$.value == "OK" ? true : false;
                                 if (resultOk) {
                                     // position = parseInt(comp.ClassResult[0].PersonResult[day].RaceResult[0].Result[0].ResultPosition);
@@ -1005,7 +1082,7 @@ function getAndSaveCompetitions(runner, body, year, io) {
     });
 }
 
-function calculatePoints(runner, io) {
+function calculatePoints(runner, io, noCalcCompetitions) {
 // function calculatePoints(runner) {
     return new Promise((resolve, reject) => {
         runner.competitions.forEach(function(comp) {
@@ -1016,6 +1093,17 @@ function calculatePoints(runner, io) {
             if (!comp.resultOk) {
                 points = 0;
                 klar = true;
+            }
+            // Check for competitions not to be calculated
+            if (!klar) {
+                // HÄR SKA DET KOLLAS EFTER ICKE-TÄVLINGAR !!!!!!!!!!!!!
+                for (var i = 0; i < noCalcCompetitions.length; i++) {
+                    if (comp.eventorId == noCalcCompetitions[i].eventorId) {
+                        // Denna ska inte räknas!
+                        klar = true;
+                        break;
+                    }
+                }
             }
             // Check nattcup = 0
             if (!klar) {
@@ -1096,10 +1184,10 @@ function calculatePoints(runner, io) {
                 }
             });
         });
-        console.log("Beräknat poäng för löpare: " + runner.nameGiven + " " + runner.nameFamily);
+        // console.log("Beräknat poäng för löpare: " + runner.nameGiven + " " + runner.nameFamily);
         // io.sockets.emit('refresh status', "Poäng beräknat och sparat för " + year + " för " + runner.nameGiven + " " + runner.nameFamily);
         resolve();
-    });    
+    });   
 }
 
 function calculateCupPoints(runner, io) {
@@ -1133,7 +1221,7 @@ function calculateCupPoints(runner, io) {
                                 reject(err);
                             }
                             // io.sockets.emit('refresh status', "Beräknat poäng för Spring till 1000 och Orionpokalen " + year + " för " + runner.nameGiven + " " + runner.nameFamily);
-                            console.log("Beräknat poäng för " + runner.nameGiven + " " + runner.nameFamily);
+                            // console.log("Beräknat poäng för " + runner.nameGiven + " " + runner.nameFamily);
                             resolve();
                         });            
                     }

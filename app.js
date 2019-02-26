@@ -36,6 +36,17 @@ app.use('/static', express.static('static'));
 app.use(flash());
 app.use(methodOverride("_method"));
 
+// var NoCalcCompetition = require('./models/noCalcCompetition');
+// var newNoCalcCompetition = {eventorId: 23544, resultYear: "2019"};
+// NoCalcCompetition.create(newNoCalcCompetition, function(err, justCreatedNoCalcCompetition) {
+//     if(err) {
+//         console.log(err);
+//     }
+//     else {
+//         console.log("Skapade en no-calc.");
+//     }
+// }); 
+
 // var io;
 var server;
 if (isProduction()) {

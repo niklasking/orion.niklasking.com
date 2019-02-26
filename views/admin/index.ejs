@@ -17,10 +17,18 @@
         </div>
         <div class="row">
             <div class="col-sm-3 col-lg-2 mb-3">
+                <button class="btn btn-danger" id="refresh2017">Hämta för 2017</button>
+            </div>
+            <div class="col-sm-3 col-lg-2 mb-3">
                 <button class="btn btn-danger" id="refresh2018">Hämta för 2018</button>
             </div>
             <div class="col-sm-3 col-lg-2 mb-3">
                 <button class="btn btn-danger" id="refresh2019">Hämta för 2019</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6 mb-3">
+                <a class="btn btn-primary" href="/admin/noComps/2019">Tävlingar som inte ingår 2019</a>
             </div>
         </div>
         <div class="row my-3">
@@ -165,15 +173,29 @@
     $('#resultSpan').text("");
     $('#resultSpan').removeClass("alert-danger");
     $('#resultSpan').removeClass("alert-success");
+    $('#refresh2017').click(function(){  
+        $.ajax({
+            url: "/admin/runners/refresh/2017",
+            data: {}, 
+            success: function(data){
+                $('#resultSpan').addClass("alert-success");
+                $('#resultSpan').text("Det gick ju fint");
+            },
+            error: function(jqXHR, textStatus, err){
+                $('#resultSpan').text("Abbans :-( 3.2017 " + textStatus  + ": " + err);
+            }
+        });
+    });
     $('#refresh2018').click(function(){  
         $.ajax({
             url: "/admin/runners/refresh/2018",
             data: {}, 
             success: function(data){
+                $('#resultSpan').addClass("alert-success");
                 $('#resultSpan').text("Det gick ju fint");
             },
             error: function(jqXHR, textStatus, err){
-                $('#resultSpan').text("Abbans :-( " + textStatus  + ": " + err);
+                $('#resultSpan').text("Abbans :-( 3 " + textStatus  + ": " + err);
             }
         });
     });
@@ -190,7 +212,7 @@
             },
             error: function(jqXHR, textStatus, err){
                 $('#resultSpan').addClass("alert-danger");
-                $('#resultSpan').text("Abbans :-( " + textStatus  + ": " + err);
+                $('#resultSpan').text("Abbans :-( 4 " + textStatus  + ": " + err);
             }
         });
     });
@@ -222,7 +244,7 @@
             },
             error: function(jqXHR, textStatus, err){
                 $('#resultSpan').addClass("alert-danger");
-                $('#resultSpan').text("Abbans :-( " + textStatus  + ": " + err);
+                $('#resultSpan').text("Abbans :-( 1 " + textStatus  + ": " + err);
             }
         });
     }
@@ -235,10 +257,9 @@
             url: "/admin/user",
             data: {}, 
             success: function(data){
-                console.log(data.error);
                 if (data.error != ""){
                     $('#resultSpan').addClass("alert-danger");
-                    $('#resultSpan').text("Abbans :-( " + data.error);
+                    $('#resultSpan').text("Abbans :-( 2 " + data.error);
                 } else {
                     data.users.forEach(function(user) {
                         user.roles.forEach(function(role) {
