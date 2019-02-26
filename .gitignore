@@ -2,3 +2,4 @@ node_modules/
 static/imgs/uploaded/src/*
 static/imgs/uploaded/thumbnail_small/*
 static/docs/uploaded/*
+package.json
