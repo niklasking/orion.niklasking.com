@@ -1,0 +1,77 @@
+<% include ../partials/orion1000standingsheader %>
+<link href="/static/css/tabulator.min.css" rel="stylesheet">
+<script type="text/javascript" src="/static/js/tabulator.min.js"></script>
+<!-- <img src="https://scontent-arn2-1.xx.fbcdn.net/v/t1.0-9/36442156_1818509338232414_4841644808042708992_o.jpg?_nc_cat=102&_nc_ht=scontent-arn2-1.xx&oh=d4a1a6b13bacaa1f1d86ecf283305a29&oe=5CA72996" data-speed="-1" class="img-parallax"> -->
+<div class="wrapper">
+    <div class="parallax-img"></div>
+    <div class="container">
+            <% if (compType == "orion1000") { %>
+                <h1 class="d-none d-sm-block">Orion Spring till 1000 - <%= year %></h1>
+                <h3 class="d-sm-none">Orion Spring till 1000 - <%= year %></h3>
+            <% } else { %>
+                <h1 class="d-none d-sm-block">Orionpokalen <%= year %></h1>
+                <h3 class="d-sm-none">Orionpokalen <%= year %></h3>
+            <% } %>
+            <div id="example-table" class="mb-5 mt-4"></div>
+        </div>
+    </div>
+    
+    <div class="wrapper">
+    </div>
+
+<script>
+    var i = 0;
+    var tabledata = [];
+    <% runners.forEach(function(runner) { %>
+        i++;
+        tabledata.push({id:       "<%= runner._id %>",
+                        position: i,
+                        name:     "<%= runner.nameGiven %> <%= runner.nameFamily %>",
+                        points:   "<%= runner.totalPointsOrion1000 %>", 
+                        wins:     "<%= runner.wins %>", 
+                        points1:  "<%= runner.orion1000Results[0] %>",
+                        points2:  "<%= runner.orion1000Results[1] %>",
+                        points3:  "<%= runner.orion1000Results[2] %>",
+                        points4:  "<%= runner.orion1000Results[3] %>",
+                        points5:  "<%= runner.orion1000Results[4] %>",
+                        points6:  "<%= runner.orion1000Results[5] %>",
+                        points7:  "<%= runner.orion1000Results[6] %>",
+                        points8:  "<%= runner.orion1000Results[7] %>",
+                        points9:  "<%= runner.orion1000Results[8] %>",
+                        points10: "<%= runner.orion1000Results[9] %>"});
+    <% }) %>
+
+    //create Tabulator on DOM element with id "example-table"
+    var table = new Tabulator("#example-table", {
+        //height:205, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
+        data:tabledata, //assign data to table
+        responsiveLayout:"hide",
+        layout:"fitColumns", //fit columns to width of table (optional)
+        columns:[ //Define Table Columns
+            {title: "#", field: "position", align: "right", width: 10, responsive: 0},
+            // {title:"Poäng", field:"points", align:"left", formatter:"progress"},
+            {title:"Namn", field:"name", minWidth: 120, responsive: 0},
+            {title:"Poäng", field:"points", align:"right", width: 75, responsive: 0},
+            {title:"Segrar", field:"wins", align:"right", width: 75, responsive: 0},
+            {title:"#1", field:"points1", width: 10, responsive: 2},
+            {title:"#2", field:"points2", width: 10, responsive: 2},
+            {title:"#3", field:"points3", width: 10, responsive: 2},
+            {title:"#4", field:"points4", width: 10, responsive: 2},
+            {title:"#5", field:"points5", width: 10, responsive: 2},
+            {title:"#6", field:"points6", width: 10, responsive: 2},
+            {title:"#7", field:"points7", width: 10, responsive: 2},
+            {title:"#8", field:"points8", width: 10, responsive: 2},
+            {title:"#9", field:"points9", width: 10, responsive: 2},
+            {title:"#10", field:"points10", width: 10, responsive: 2},
+        ],
+        rowClick:function(e, row){ //trigger an alert message when the row is clicked
+            // alert("Row " + row.getData().id + " Clicked!!!!");
+            // var url = "/orion1000/" + row.getData().id + "?redirectUrl=" + "orionpokalen";
+            var url = "/orion1000standings/" + row.getData().id + "/<%= year %>?compType=<%= compType %>";
+            // window.location(url);
+            $(location).attr('href', url);
+        },
+    });
+</script>
+
+<% include ../partials/footer %>

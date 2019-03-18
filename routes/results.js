@@ -39,6 +39,21 @@ router.get("/orion1000/:year", function(req, res) {
         }
     });
 });
+router.get("/orion1000standings/:year", function(req, res) {
+    var year = req.params.year;
+    var query = Runner.
+                find({totalPointsOrion1000: { $gt: 0 }, resultYear: year}).
+                sort({ totalPointsOrion1000: -1, wins: -1 });
+    query.exec(function(err, runners) { 
+        if (err) {
+            console.log(err);
+        } else {
+            res.render("orion1000/orion1000standings", { runners: runners, 
+                                            compType: "orion1000",
+                                            year: year });
+        }
+    });
+});
 
 
 router.get("/orion1000/:id/:year", function(req, res) {
@@ -51,6 +66,19 @@ router.get("/orion1000/:id/:year", function(req, res) {
             console.log(err);
         } else {
             res.render("orion1000/results", {runner: runners[0], compType: req.query.compType, year: year});
+        }
+    });
+});
+router.get("/orion1000standings/:id/:year", function(req, res) {
+    var year = req.params.year;
+    var query = Runner.
+                find({_id: req.params.id, resultYear: year}).
+                populate("competitions");
+    query.exec(function(err, runners) { 
+        if (err) {
+            console.log(err);
+        } else {
+            res.render("orion1000/standingsresults", {runner: runners[0], compType: req.query.compType, year: year});
         }
     });
 });

@@ -1,0 +1,25 @@
+.wrapper {
+    height: 70vh;
+  }
+  
+  .parallax-img {
+    height: 100%;
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+  
+  /* Other styling elements, that are not necessary for the example */
+  
+  * {
+    font-family: Candara;
+  }
+  
+  p {
+    font-size: 1.1rem;
+  }
+  
+  .parallax-img {
+    background-image: url('https://scontent-arn2-1.xx.fbcdn.net/v/t1.0-9/36442156_1818509338232414_4841644808042708992_o.jpg?_nc_cat=102&_nc_ht=scontent-arn2-1.xx&oh=d4a1a6b13bacaa1f1d86ecf283305a29&oe=5CA72996');
+  }
