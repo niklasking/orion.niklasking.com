@@ -19,7 +19,7 @@
                 <tr>
                     <td><%= comp.date %></td>
                     <td><%= comp.name %></td>
-                    <td><%= comp.className %></td>
+                    <td><a href="https://eventor.orientering.se/Events/ResultList?eventId=<%= comp.eventorId %>&eventClassId=<%= comp.eventorClassId %>"><%= comp.className %></a></td>
                     <% if (comp.resultOk) { %>
                         <td>OK</td>
                     <% } else { %>

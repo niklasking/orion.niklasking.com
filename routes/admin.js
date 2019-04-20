@@ -910,6 +910,7 @@ function getAndSaveCompetitions(runner, body, year, io) {
                 var category = comp.Event[0].EventClassificationId;
                 var className = comp.ClassResult[0].EventClass != undefined ? comp.ClassResult[0].EventClass[0].Name : "";
                 var classType = comp.ClassResult[0].EventClass != undefined ? comp.ClassResult[0].EventClass[0].ClassTypeId : "";
+                var eventorClassId = comp.ClassResult[0].EventClass != undefined ? comp.ClassResult[0].EventClass[0].EventClassId : "";
                 var starts = comp.ClassResult[0].EventClass[0].ClassRaceInfo[0].$ != undefined ?
                              parseInt(comp.ClassResult[0].EventClass[0].ClassRaceInfo[0].$.noOfStarts) : 0;
 
@@ -942,7 +943,8 @@ function getAndSaveCompetitions(runner, body, year, io) {
                             relay: relay,
                             relayTeam: relayTeam,
                             relayLeg: relayLeg,
-                            resultYear: year
+                            resultYear: year,
+                            eventorClassId: eventorClassId
                         });
                         if (comp.ClassResult[0].PersonResult[0].Organisation != undefined) {
                             if (comp.ClassResult[0].PersonResult[0].Organisation[0].OrganisationId == "288" || comp.ClassResult[0].PersonResult[0].Organisation[0].OrganisationId == "7") {
@@ -985,7 +987,8 @@ function getAndSaveCompetitions(runner, body, year, io) {
                                     relay: relay,
                                     relayTeam: relayTeam,
                                     relayLeg: relayLeg,
-                                    resultYear: year
+                                    resultYear: year,
+                                    eventorClassId: eventorClassId
                                 });
                                 if (comp.ClassResult[day].PersonResult[0].Organisation != undefined) {
                                     if (comp.ClassResult[day].PersonResult[0].Organisation[0].OrganisationId == "288" || comp.ClassResult[day].PersonResult[0].Organisation[0].OrganisationId == "7") {
@@ -1024,7 +1027,8 @@ function getAndSaveCompetitions(runner, body, year, io) {
                                     relay: relay,
                                     relayTeam: relayTeam,
                                     relayLeg: relayLeg,
-                                    resultYear: year
+                                    resultYear: year,
+                                    eventorClassId: eventorClassId
                                 });
                                 if (comp.ClassResult[0].PersonResult[0].Organisation != undefined) {
                                     if (comp.ClassResult[0].PersonResult[0].Organisation[0].OrganisationId == "288" || comp.ClassResult[0].PersonResult[0].Organisation[0].OrganisationId == "7") {
@@ -1057,7 +1061,8 @@ function getAndSaveCompetitions(runner, body, year, io) {
                         relay: relay,
                         relayTeam: relayTeam,
                         relayLeg: relayLeg,
-                        resultYear: year
+                        resultYear: year,
+                        eventorClassId: eventorClassId
                     });
                     if (comp.ClassResult[0].TeamResult[0].Organisation != undefined) {
                         for (var i = 0; i < comp.ClassResult[0].TeamResult[0].Organisation.length; i++) {

@@ -18,7 +18,8 @@ var competitionSchema = new mongoose.Schema({
     relayLeg: { type: String, default: "" },
     // basePoints: { type: Number, default: 30 },
     // fixedPoints: { type: Number, default: 0 },
-    points: { type: Number, default: 0 }
+    points: { type: Number, default: 0 },
+    eventorClassId: String
 });
 
 module.exports = mongoose.model("Competition", competitionSchema);
