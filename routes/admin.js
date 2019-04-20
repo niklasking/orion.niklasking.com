@@ -945,7 +945,7 @@ function getAndSaveCompetitions(runner, body, year, io) {
                             resultYear: year
                         });
                         if (comp.ClassResult[0].PersonResult[0].Organisation != undefined) {
-                            if (comp.ClassResult[0].PersonResult[0].Organisation[0].OrganisationId == "288") {
+                            if (comp.ClassResult[0].PersonResult[0].Organisation[0].OrganisationId == "288" || comp.ClassResult[0].PersonResult[0].Organisation[0].OrganisationId == "7") {
                                 // Remove O-ringen elitsprinten, since it is also reported for O-ringen.
                                 if (eventorId.toString() != ORINGEN_ELITSPRINT) {
                                     competitionsArray.push(newCompetition);
@@ -988,7 +988,7 @@ function getAndSaveCompetitions(runner, body, year, io) {
                                     resultYear: year
                                 });
                                 if (comp.ClassResult[day].PersonResult[0].Organisation != undefined) {
-                                    if (comp.ClassResult[day].PersonResult[0].Organisation[0].OrganisationId == "288") {
+                                    if (comp.ClassResult[day].PersonResult[0].Organisation[0].OrganisationId == "288" || comp.ClassResult[day].PersonResult[0].Organisation[0].OrganisationId == "7") {
                                         competitionsArray.push(newCompetition);
                                     }
                                 }
@@ -1027,7 +1027,7 @@ function getAndSaveCompetitions(runner, body, year, io) {
                                     resultYear: year
                                 });
                                 if (comp.ClassResult[0].PersonResult[0].Organisation != undefined) {
-                                    if (comp.ClassResult[0].PersonResult[0].Organisation[0].OrganisationId == "288") {
+                                    if (comp.ClassResult[0].PersonResult[0].Organisation[0].OrganisationId == "288" || comp.ClassResult[0].PersonResult[0].Organisation[0].OrganisationId == "7") {
                                         competitionsArray.push(newCompetition);
                                     }
                                 }
@@ -1060,8 +1060,12 @@ function getAndSaveCompetitions(runner, body, year, io) {
                         resultYear: year
                     });
                     if (comp.ClassResult[0].TeamResult[0].Organisation != undefined) {
-                        if (comp.ClassResult[0].TeamResult[0].Organisation[0].OrganisationId == "288") {
-                            competitionsArray.push(newCompetition);
+                        for (var i = 0; i < comp.ClassResult[0].TeamResult[0].Organisation.length; i++) {
+                            var org = comp.ClassResult[0].TeamResult[0].Organisation[i];
+                            if (org.OrganisationId == "288" || org.OrganisationId == "7") {
+                                competitionsArray.push(newCompetition);
+                                break;
+                            }
                         }
                     }
                 }
